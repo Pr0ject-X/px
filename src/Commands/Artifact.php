@@ -11,11 +11,13 @@ use Robo\Exception\TaskException;
 use Robo\Task\Composer\loadTasks as taskComposer;
 use Robo\Task\Filesystem\loadTasks as taskFilesystem;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Define the artifact commands.
  */
-class Artifact extends CommandTasksBase {
+class Artifact extends CommandTasksBase
+{
 
     use taskComposer;
     use taskFilesystem;
@@ -34,6 +36,8 @@ class Artifact extends CommandTasksBase {
         'build-mirror' => [],
         'project-copy' => [],
         'project-mirror' => [],
+        'remove-submodules' => [],
+        'search-submodules-depth' => 1
     ]) {
         $projectRoot = $this->projectRootPath();
         $buildRoot = "{$projectRoot}/{$opts['build-dir']}";
@@ -56,6 +60,12 @@ class Artifact extends CommandTasksBase {
         $this
             ->invokeComposerBuild($buildRoot)
             ->invokeProjectBuild($opts, $projectRoot, $buildRoot);
+
+        $this->invokeSubmoduleCleanup(
+            $buildRoot,
+            $opts['remove-submodules'],
+            $opts['search-submodules-depth']
+        );
 
         $this->runCommand('artifact:deploy');
     }
@@ -138,6 +148,40 @@ class Artifact extends CommandTasksBase {
             if ($runCommand) {
                 $this->taskSymfonyCommand($command)->run();
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Invoke the submodule cleanup.
+     *
+     * @param $buildRoot
+     *   The build root directory.
+     * @param array $submoduleDirs
+     *   An array of submodule directories.
+     * @param int $submoduleSearchDepth
+     *   The depth that should be searched for submodules.
+     *
+     * @return \Droath\ProjectX\Commands\Artifact
+     */
+    protected function invokeSubmoduleCleanup(
+        $buildRoot,
+        array $submoduleDirs = [],
+        $submoduleSearchDepth = 1
+    )
+    {
+        $this->removeSubmodulesInVendor($buildRoot);
+
+        foreach ($submoduleDirs as $submoduleDir) {
+            $searchDir = "{$buildRoot}/{$submoduleDir}";
+
+            if (!file_exists($searchDir)) {
+                continue;
+            }
+            $this->removeSubmodules(
+                [$searchDir], $submoduleSearchDepth
+            );
         }
 
         return $this;
@@ -247,6 +291,54 @@ class Artifact extends CommandTasksBase {
                     $this->formatPathByType($projectRoot, $type, $dirs),
                     $this->formatPathByType($buildRoot, $type, $dirs)
                 );
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove .git submodules in vendor directory.
+     *
+     * @param $buildRoot
+     *   The build root path.
+     *
+     * @return $this
+     */
+    protected function removeSubmodulesInVendor($buildRoot)
+    {
+        $this->removeSubmodules(
+            ["{$buildRoot}/vendor"], 2
+        );
+
+        return $this;
+    }
+
+    /**
+     * Remove the .git submodules.
+     *
+     * @param array $searchDirs
+     *   An array of search directories.
+     * @param int $depth
+     *   Set directory depth for searching.
+     *
+     * @return $this
+     */
+    protected function removeSubmodules(array $searchDirs, $depth = 1)
+    {
+        if (!empty($searchDirs)) {
+            $finder = (new Finder())
+                ->in($searchDirs)
+                ->ignoreVCS(false)
+                ->ignoreDotFiles(false)
+                ->depth($depth)
+                ->name('.git');
+
+            foreach (iterator_to_array($finder) as $filePath => $fileInfo) {
+                if (!file_exists($filePath) || !$fileInfo->isDir()) {
+                    continue;
+                }
+                $this->_deleteDir($filePath);
             }
         }
 
