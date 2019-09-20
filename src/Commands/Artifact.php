@@ -44,7 +44,7 @@ class Artifact extends CommandTasksBase
 
         if (file_exists($buildRoot)) {
             $cleanBuild = $this->confirm(
-                'Clean the build the directory? [yes]', true
+                'Clean the build directory? [yes]', true
             );
             if ($cleanBuild) {
                 $this->taskCleanDir($buildRoot)->run();
