@@ -1,0 +1,26 @@
+{
+    "name": "droath/px",
+    "description": "Project-X is a plug-able tool for streamlining redundant project tasks without hassle.",
+    "type": "library",
+    "license": "MIT",
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "bin": [
+        "bin/px"
+    ],
+    "authors": [
+        {
+            "name": "Travis Tomka",
+            "email": "underoathosx@gmail.com"
+        }
+    ],
+    "require": {
+        "consolidation/robo": "^1.4",
+        "symfony/console": "^3.0|^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Droath\\ProjectX\\": "./src"
+        }
+    }
+}
