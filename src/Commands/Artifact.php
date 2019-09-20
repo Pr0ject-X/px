@@ -18,7 +18,6 @@ use Symfony\Component\Finder\Finder;
  */
 class Artifact extends CommandTasksBase
 {
-
     use taskComposer;
     use taskFilesystem;
 
@@ -66,8 +65,6 @@ class Artifact extends CommandTasksBase
             $opts['remove-submodules'],
             $opts['search-submodules-depth']
         );
-
-        $this->runCommand('artifact:deploy');
     }
 
     /**
@@ -131,12 +128,14 @@ class Artifact extends CommandTasksBase
      *
      * @param $name
      *   The symfony command name.
+     * @param array $options
+     *   An array of command options.
      * @param bool $default
      *   The confirmation default answer.
      *
      * @return \Droath\ProjectX\Commands\Artifact
      */
-    protected function runCommand($name, $default = true)
+    protected function runCommand($name, $options = [], $default = true)
     {
         $command = $this->findCommand($name);
 
@@ -146,7 +145,13 @@ class Artifact extends CommandTasksBase
                 $default
             );
             if ($runCommand) {
-                $this->taskSymfonyCommand($command)->run();
+                $options += $this->getCommandConfigOptions($name);
+
+                $commandTask = $this->taskSymfonyCommand($command);
+                foreach ($options as $option => $value) {
+                    $commandTask->opt($option, $value);
+                }
+                $commandTask->run();
             }
         }
 
@@ -297,6 +302,23 @@ class Artifact extends CommandTasksBase
         return $this;
     }
 
+    /**
+     * Get command configuration options.
+     *
+     * @param $name
+     *   The command name.
+     *
+     * @return array
+     *   An array of command configuration options.
+     */
+    protected function getCommandConfigOptions($name) {
+        $configuration = PxApp::getConfiguration();
+        $configCommandName = strtr($name, ':', '.');
+
+        return $configuration->get(
+            "command.{$configCommandName}.options"
+        ) ?: [];
+    }
     /**
      * Remove .git submodules in vendor directory.
      *
