@@ -1,0 +1,24 @@
+# Automatically added by the project-x utility.
+function px()
+{
+  if [ "`git rev-parse --show-cdup 2> /dev/null`" != "" ]; then
+    GIT_ROOT=$(git rev-parse --show-cdup)
+  else
+    GIT_ROOT="."
+  fi
+
+  if [ -f "$GIT_ROOT/vendor/bin/px" ]; then
+    $GIT_ROOT/vendor/bin/px "$@"
+  elif [ -f "$GIT_ROOT/../vendor/bin/px" ]; then
+    $GIT_ROOT/../vendor/bin/px "$@"
+  else
+  	CWD_ROOT="$(pwd)";
+
+  	if [ -f "$CWD_ROOT/vendor/bin/px" ]; then
+  	  $CWD_ROOT/vendor/bin/px "$@"
+  	else
+      echo "You must run this command within a project that supports project-x."
+      return 1
+  	fi
+  fi
+}

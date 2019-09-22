@@ -4,6 +4,7 @@ namespace Droath\ProjectX;
 
 use Composer\Autoload\ClassLoader;
 use Droath\ProjectX\Commands\Artifact;
+use Droath\ProjectX\Commands\Core;
 use Robo\Robo;
 use Robo\Runner;
 use Symfony\Component\Console\Application;
@@ -112,6 +113,7 @@ class PxApp extends Application
     public static function coreCommandClasses()
     {
         return [
+            Core::class,
             Artifact::class,
         ];
     }

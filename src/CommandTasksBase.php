@@ -45,6 +45,21 @@ abstract class CommandTasksBase extends Tasks
     }
 
     /**
+     * Display the command info message.
+     *
+     * @param $message
+     *   The info message.
+     *
+     * @return $this
+     */
+    protected function info($message)
+    {
+        $this->io()->note($message);
+
+        return $this;
+    }
+
+    /**
      * Display the command error message.
      *
      * @param $message
