@@ -19,6 +19,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PxApp extends Application
 {
     /** @var string  */
+    const CONFIG_FILENAME = 'project-x';
+
+    /** @var string  */
     const APPLICATION_NAME = 'Project-X';
 
     /** @var string  */
@@ -117,10 +120,18 @@ class PxApp extends Application
      */
     public static function coreCommandClasses()
     {
-        return [
+        $classes = [
             Core::class,
-            Artifact::class,
+            Config::class,
+            Artifact::class
         ];
+        $config = static::getConfiguration();
+
+        if ($config->has('environment.type')) {
+            $classes[] = Environment::class;
+        }
+
+        return $classes;
     }
 
     /**
@@ -144,9 +155,10 @@ class PxApp extends Application
      *   An array of configuration paths.
      */
     public static function configPaths() {
+        $filename = static::CONFIG_FILENAME;
         return [
-            'project-x.yml',
-            'project-x.local.yml',
+            "{$filename}.yml",
+            "{$filename}.local.yml",
         ];
     }
 
@@ -175,9 +187,13 @@ class PxApp extends Application
      */
     public static function createConfiguration()
     {
-        static::$config = Robo::createConfiguration(static::configPaths());
+        $config = new \Pr0jectX\Px\Config\Config();
 
-        return static::$config;
+        Robo::loadConfiguration(
+            static::configPaths(), $config
+        );
+
+        return $config;
     }
 
     /**
