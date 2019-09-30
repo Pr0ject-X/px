@@ -1,10 +1,10 @@
 <?php
 
-namespace Droath\ProjectX\ProjectX\Plugin\DeployType;
+namespace Pr0jectX\Px\ProjectX\Plugin\DeployType;
 
-use Droath\ProjectX\Deploy\GitDeploy;
+use Pr0jectX\Px\Deploy\GitDeploy;
 use Symfony\Component\Console\Input\InputOption;
-use Droath\ProjectX\Exception\DeployTypeOptionRequired;
+use Pr0jectX\Px\Exception\DeployTypeOptionRequired;
 use Robo\Task\Vcs\loadTasks as taskVcs;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
 use Robo\Contract\TaskInterface;
 use Robo\Contract\VerbosityThresholdInterface;

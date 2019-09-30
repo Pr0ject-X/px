@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX\ProjectX\Plugin\DeployType;
+namespace Pr0jectX\Px\ProjectX\Plugin\DeployType;
 
 /**
  * Define the deployment type interface.

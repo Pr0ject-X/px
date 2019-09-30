@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
 use Robo\Tasks;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -152,7 +152,7 @@ abstract class CommandTasksBase extends Tasks
     /**
      * Get symfony application service.
      *
-     * @return \Droath\ProjectX\PxApp
+     * @return \Pr0jectX\Px\PxApp
      *   Return the project-x application.
      */
     protected function application()

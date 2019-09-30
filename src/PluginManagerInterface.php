@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
 /**
  * Define the plugin manager interface.
@@ -34,7 +34,7 @@ interface PluginManagerInterface
      * @param array $configurations
      *   The plugin configurations.
      *
-     * @return \Droath\ProjectX\PluginInterface
+     * @return \Pr0jectX\Px\PluginInterface
      *   The instantiated plugin class.
      *
      */

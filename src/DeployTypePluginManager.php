@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
 /**
  * Define the deploy type plugin manager.

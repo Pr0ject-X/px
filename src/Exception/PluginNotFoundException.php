@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX\Exception;
+namespace Pr0jectX\Px\Exception;
 
 /**
  * Define the plugin id not found exception.

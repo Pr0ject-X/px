@@ -1,6 +1,6 @@
 <?php
 
-use Droath\ProjectX\PxApp;
+use Pr0jectX\Px\PxApp;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 

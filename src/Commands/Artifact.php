@@ -1,12 +1,12 @@
 <?php
 
-namespace Droath\ProjectX\Commands;
+namespace Pr0jectX\Px\Commands;
 
 use Consolidation\AnnotatedCommand\AnnotatedCommand;
 use Consolidation\AnnotatedCommand\AnnotationData;
-use Droath\ProjectX\CommandTasksBase;
-use Droath\ProjectX\ProjectX\Plugin\DeployType\DeployTypeInterface;
-use Droath\ProjectX\PxApp;
+use Pr0jectX\Px\CommandTasksBase;
+use Pr0jectX\Px\ProjectX\Plugin\DeployType\DeployTypeInterface;
+use Pr0jectX\Px\PxApp;
 use Robo\Exception\TaskException;
 use Robo\Task\Composer\loadTasks as taskComposer;
 use Robo\Task\Filesystem\loadTasks as taskFilesystem;
@@ -133,7 +133,7 @@ class Artifact extends CommandTasksBase
      * @param bool $default
      *   The confirmation default answer.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      */
     protected function runCommand($name, $options = [], $default = true)
     {
@@ -168,7 +168,7 @@ class Artifact extends CommandTasksBase
      * @param int $submoduleSearchDepth
      *   The depth that should be searched for submodules.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      */
     protected function invokeSubmoduleCleanup(
         $buildRoot,
@@ -198,7 +198,7 @@ class Artifact extends CommandTasksBase
      * @param $buildPath
      *   The fully qualified build path.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
     protected function invokeComposerBuild($buildPath)
@@ -276,7 +276,7 @@ class Artifact extends CommandTasksBase
      * @param $buildRoot
      *   The project build root path.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
     protected function invokeProjectBuild($options, $projectRoot, $buildRoot)
@@ -426,7 +426,7 @@ class Artifact extends CommandTasksBase
      * @param $toPath
      *   The destination to path.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
     protected function moveSourceToDestination($method, array $sources, $fromPath, $toPath)
@@ -458,7 +458,7 @@ class Artifact extends CommandTasksBase
      * @param $buildPath
      *   The fully qualified build path.
      *
-     * @return \Droath\ProjectX\Commands\Artifact
+     * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
     protected function moveComposerToBuild($buildPath)
@@ -486,7 +486,7 @@ class Artifact extends CommandTasksBase
     /**
      * Deploy type plugin manager.
      *
-     * @return \Droath\ProjectX\PluginManagerInterface
+     * @return \Pr0jectX\Px\PluginManagerInterface
      */
     protected function deployTypePluginManager()
     {

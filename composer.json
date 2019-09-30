@@ -1,5 +1,5 @@
 {
-    "name": "droath/px",
+    "name": "pr0ject-x/px",
     "description": "Project-X is a plug-able tool for streamlining redundant project tasks without hassle.",
     "type": "library",
     "license": "MIT",
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Droath\\ProjectX\\": "./src"
+            "Pr0jectX\\Px\\": "./src"
         }
     }
 }

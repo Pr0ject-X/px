@@ -1,9 +1,9 @@
 <?php
 
-namespace Droath\ProjectX\Commands;
+namespace Pr0jectX\Px\Commands;
 
-use Droath\ProjectX\CommandTasksBase;
-use Droath\ProjectX\CommonCommandTrait;
+use Pr0jectX\Px\CommandTasksBase;
+use Pr0jectX\Px\CommonCommandTrait;
 
 /**
  * Define the project-x core command.

@@ -1,10 +1,12 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
 use Composer\Autoload\ClassLoader;
-use Droath\ProjectX\Commands\Artifact;
-use Droath\ProjectX\Commands\Core;
+use Pr0jectX\Px\Commands\Artifact;
+use Pr0jectX\Px\Commands\Config;
+use Pr0jectX\Px\Commands\Core;
+use Pr0jectX\Px\Commands\Environment;
 use Robo\Robo;
 use Robo\Runner;
 use Symfony\Component\Console\Application;
@@ -99,8 +101,11 @@ class PxApp extends Application
      */
     public static function setContainer()
     {
-        static::$container
-            ->share('deployTypePluginManager', \Droath\ProjectX\DeployTypePluginManager::class)
+        $container = static::$container;
+
+        $container->share('deployTypePluginManager', \Pr0jectX\Px\DeployTypePluginManager::class)
+            ->withArgument('relativeNamespaceDiscovery');
+        $container->share('environmentTypePluginManager', \Pr0jectX\Px\EnvironmentTypePluginManager::class)
             ->withArgument('relativeNamespaceDiscovery');
     }
 

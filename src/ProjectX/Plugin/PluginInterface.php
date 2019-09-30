@@ -1,6 +1,6 @@
 <?php
 
-namespace Droath\ProjectX\ProjectX\Plugin;
+namespace Pr0jectX\Px\ProjectX\Plugin;
 
 /**
  * Define plugin type interface.

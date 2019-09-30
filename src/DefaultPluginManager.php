@@ -1,9 +1,9 @@
 <?php
 
-namespace Droath\ProjectX;
+namespace Pr0jectX\Px;
 
-use Droath\ProjectX\Exception\PluginNotFoundException;
-use Droath\ProjectX\ProjectX\Plugin\PluginInterface;
+use Pr0jectX\Px\Exception\PluginNotFoundException;
+use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use League\Container\ContainerAwareInterface;
 use Robo\ClassDiscovery\ClassDiscoveryInterface;
 use Robo\Collection\CollectionBuilder;
@@ -107,7 +107,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     protected function findPluginById($plugin_id, array $plugins) {
         $interface = PluginInterface::class;
 
-        /** @var \Droath\ProjectX\PluginInterface $class_name */
+        /** @var \Pr0jectX\Px\PluginInterface $class_name */
         foreach ($plugins as $class_name) {
             if (!class_exists($class_name)
                 || !is_subclass_of($class_name, $interface)

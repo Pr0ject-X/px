@@ -1,10 +1,10 @@
 <?php
 
-namespace Droath\ProjectX\ProjectX\Plugin\DeployType;
+namespace Pr0jectX\Px\ProjectX\Plugin\DeployType;
 
-use Droath\ProjectX\CommonCommandTrait;
-use Droath\ProjectX\Exception\DeploymentRuntimeException;
-use Droath\ProjectX\ProjectX\Plugin\PluginTasksBase;
+use Pr0jectX\Px\CommonCommandTrait;
+use Pr0jectX\Px\Exception\DeploymentRuntimeException;
+use Pr0jectX\Px\ProjectX\Plugin\PluginTasksBase;
 use Symfony\Component\Console\Question\Question;
 
 /**
