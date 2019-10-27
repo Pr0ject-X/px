@@ -73,10 +73,17 @@ class Artifact extends CommandTasksBase
      * @param array $options
      * @option plugin-id Set the deploy type plugin identifier.
      * @option build-path Set the deploy build path.
+     * @option no-build-version Don't set a build version.
+     * @option versioning-method Set the method to use when storing the build version (e.g. tag, or file).
      *
      * @throws \Robo\Exception\TaskException
      */
-    public function artifactDeploy($options = ['plugin-id' => 'git', 'build-dir' => 'build'])
+    public function artifactDeploy($options = [
+        'plugin-id' => 'git',
+        'build-dir' => 'build',
+        'no-build-version' => false,
+        'versioning-method' => 'tag'
+    ])
     {
         $buildRoot = PxApp::projectRootPath() . "/{$options['build-dir']}";
 
