@@ -179,9 +179,8 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
                 $stack
                     ->exec('fetch --all')
                     ->exec("reset --soft {$origin}/{$branch}");
-            } else {
-                $stack->exec("checkout -b {$branch}");
             }
+            $stack->exec("checkout -b {$branch}");
         } else {
             $stack
                 ->exec("checkout -b {$branch}")
