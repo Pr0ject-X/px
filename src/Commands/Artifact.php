@@ -212,28 +212,17 @@ class Artifact extends CommandTasksBase
     {
         $this->moveComposerToBuild($buildPath);
 
-        $updateResult = $this->taskComposerUpdate()
+        $installResult = $this->taskComposerInstall()
             ->noDev()
             ->preferDist()
+            ->option('quiet')
+            ->noInteraction()
             ->workingDir($buildPath)
-            ->option('lock')
+            ->optimizeAutoloader()
             ->run();
 
-        if ($updateResult->getExitCode() === 0) {
-            $this->success('Composer update has ran successfully.');
-
-            $installResult = $this->taskComposerInstall()
-                ->noDev()
-                ->preferDist()
-                ->option('quiet')
-                ->noInteraction()
-                ->workingDir($buildPath)
-                ->optimizeAutoloader()
-                ->run();
-
-            if ($installResult->getExitCode() === 0) {
-                $this->success('Composer install has ran successfully.');
-            }
+        if ($installResult->getExitCode() === 0) {
+            $this->success('Composer install has ran successfully.');
         }
 
         return $this;
