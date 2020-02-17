@@ -35,6 +35,8 @@ class Artifact extends CommandTasksBase
         'build-mirror' => [],
         'project-copy' => [],
         'project-mirror' => [],
+        'install-copy' => [],
+        'install-mirror' => [],
         'remove-submodules' => [],
         'search-submodules-depth' => 1
     ]) {
@@ -57,7 +59,7 @@ class Artifact extends CommandTasksBase
         }
 
         $this
-            ->invokeComposerBuild($buildRoot)
+            ->invokeComposerBuild($opts, $projectRoot, $buildRoot)
             ->invokeProjectBuild($opts, $projectRoot, $buildRoot);
 
         $this->invokeSubmoduleCleanup(
@@ -202,22 +204,34 @@ class Artifact extends CommandTasksBase
     /**
      * Invoke composer update/install process.
      *
-     * @param $buildPath
-     *   The fully qualified build path.
+     * @param array $options
+     *   An array of command options.
+     * @param $projectRoot
+     *   The project root path.
+     * @param $buildRoot
+     *   The project build root path.
      *
      * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
-    protected function invokeComposerBuild($buildPath)
+    protected function invokeComposerBuild(
+        array $options,
+        $projectRoot,
+        $buildRoot
+    )
     {
-        $this->moveComposerToBuild($buildPath);
+        $this->moveComposerToBuild(
+            $options,
+            $buildRoot,
+            $projectRoot
+        );
 
         $installResult = $this->taskComposerInstall()
             ->noDev()
             ->preferDist()
             ->option('quiet')
             ->noInteraction()
-            ->workingDir($buildPath)
+            ->workingDir($buildRoot)
             ->optimizeAutoloader()
             ->run();
 
@@ -275,27 +289,53 @@ class Artifact extends CommandTasksBase
      * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
-    protected function invokeProjectBuild($options, $projectRoot, $buildRoot)
+    protected function invokeProjectBuild(
+        array $options,
+        $projectRoot,
+        $buildRoot
+    )
     {
-        $projectDir = $options['project-dir'];
-
         foreach (['project', 'build'] as $type) {
-            $dirs = [$projectDir];
-
-            foreach (['copy', 'mirror'] as $method) {
-                $sources = $this->extractSourcesFromOptions(
-                    $options, $type, $method
-                );
-                $this->moveSourceToDestination(
-                    $method,
-                    $sources,
-                    $this->formatPathByType($projectRoot, $type, $dirs),
-                    $this->formatPathByType($buildRoot, $type, $dirs)
-                );
-            }
+            $this->invokeFileSystemCommandProcess(
+                $type, $options, $buildRoot, $projectRoot
+            );
         }
 
         return $this;
+    }
+
+    /**
+     * Invoke the file system command process.
+     *
+     * @param $type
+     *   The process type (install, project, build, etc).
+     * @param array $options
+     *   An array of the command options.
+     * @param $projectRoot
+     *   The project root path.
+     * @param $buildRoot
+     *   The project build root path.
+     */
+    protected function invokeFileSystemCommandProcess(
+        $type,
+        array $options,
+        $buildRoot,
+        $projectRoot
+    )
+    {
+        $dirs = [$options['project-dir']];
+
+        foreach (['copy', 'mirror'] as $method) {
+            $sources = $this->extractSourcesFromOptions(
+                $options, $type, $method
+            );
+            $this->moveSourceToDestination(
+                $method,
+                $sources,
+                $this->formatPathByType($projectRoot, $type, $dirs),
+                $this->formatPathByType($buildRoot, $type, $dirs)
+            );
+        }
     }
 
     /**
@@ -451,30 +491,43 @@ class Artifact extends CommandTasksBase
     /**
      * Move composer to the build directory.
      *
-     * @param $buildPath
-     *   The fully qualified build path.
+     * @param array $options
+     *   An array of the command options.
+     * @param $projectRoot
+     *   The project root path.
+     * @param $buildRoot
+     *   The project build root path.
      *
      * @return \Pr0jectX\Px\Commands\Artifact
      *   The artifact command class.
      */
-    protected function moveComposerToBuild($buildPath)
-    {
-        $stack = $this->taskFilesystemStack();
-        $projectRoot = $this->projectRootPath();
+    protected function moveComposerToBuild(
+        array $options,
+        $buildRoot,
+        $projectRoot
+    ) {
+        $options['install-copy'] ?? [];
+        $options['install-mirror'] ?? [];
 
-        if (file_exists("{$projectRoot}/patches")) {
-            $stack->mirror("{$projectRoot}/patches", "{$buildPath}/patches");
+        if (file_exists("{$projectRoot}/patches")
+            && !in_array('patches', $options['install-mirror'])) {
+            $options['install-mirror'][] = 'patches';
         }
-        $stack->copy("{$projectRoot}/composer.json", "{$buildPath}/composer.json");
-        $stack->copy("{$projectRoot}/composer.lock", "{$buildPath}/composer.lock");
+        $requiredComposerFiles = ['composer.json', 'composer.lock'];
 
-        $result = $stack->run();
-
-        if ($result->getExitCode() === 0) {
-            $this->success(
-                'Composer files was copied to the build directory.'
-            );
+        foreach ($requiredComposerFiles as $requiredFile) {
+            if (!in_array($requiredFile, $options['install-copy'])) {
+                $options['install-copy'][] = $requiredFile;
+            }
         }
+
+        $this->invokeFileSystemCommandProcess(
+            'install', $options, $buildRoot, $projectRoot
+        );
+
+        $this->success(
+            'Composer installation files were copied to the build directory.'
+        );
 
         return $this;
     }
