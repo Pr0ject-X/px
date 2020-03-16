@@ -3,6 +3,7 @@
 namespace Pr0jectX\Px\ProjectX\Plugin\DeployType;
 
 use Pr0jectX\Px\Deploy\GitDeploy;
+use Robo\Task\Vcs\GitStack;
 use Symfony\Component\Console\Input\InputOption;
 use Pr0jectX\Px\Exception\DeployTypeOptionRequired;
 use Robo\Task\Vcs\loadTasks as taskVcs;
@@ -17,7 +18,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function pluginId()
+    public static function pluginId() : string
     {
         return 'git';
     }
@@ -25,7 +26,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function pluginLabel()
+    public static function pluginLabel() : string
     {
         return 'Git';
     }
@@ -33,7 +34,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function deployOptions()
+    public static function deployOptions() : array
     {
         return [
             new InputOption(
@@ -62,7 +63,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getRepo()
+    public function getRepo() : string
     {
         $options = $this->getOptions();
 
@@ -78,7 +79,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getOrigin()
+    public function getOrigin() : string
     {
         $options = $this->getOptions();
 
@@ -94,7 +95,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getBranch()
+    public function getBranch() : string
     {
         return $this->getOptions()['branch'];
     }
@@ -105,7 +106,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The build version method (e.g. tag or file).
      */
-    public function getBuildVersioningMethod()
+    public function getBuildVersioningMethod() : string
     {
         return $this->getOptions()['versioning-method'] ?? 'tag';
     }
@@ -116,7 +117,8 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the build version shouldn't be applied; otherwise false.
      */
-    public function noBuildVersion() {
+    public function noBuildVersion() : bool
+    {
         return $this->getOptions()['no-build-version'] ?? false;
     }
 
@@ -199,7 +201,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the build directory has GIT support; otherwise false.
      */
-    protected function buildDirectoryHasGit()
+    protected function buildDirectoryHasGit() : bool
     {
         return file_exists("{$this->getBuildDir()}/.git");
     }
@@ -210,7 +212,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The latest build version based on the versioning method.
      */
-    protected function latestBuildVersion()
+    protected function latestBuildVersion() : string
     {
         switch ($this->getBuildVersioningMethod()) {
             case 'file':
@@ -280,13 +282,13 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if contents has been updated; otherwise false.
      */
-    protected function updateBuildVersionFile($buildVersion)
+    protected function updateBuildVersionFile($buildVersion) : bool
     {
         $status = file_put_contents(
             $this->getBuildVersionFile(), $buildVersion
         );
 
-        return $status !== false ? true : false;
+        return $status !== false;
     }
 
     /**
@@ -295,7 +297,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if git tracked files changed; otherwise false.
      */
-    protected function hasTrackedFilesChanged()
+    protected function hasTrackedFilesChanged() : bool
     {
         $task = $this->getGitBuildStack()
             ->exec("status --untracked-files=no --porcelain");
@@ -316,7 +318,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the remote branch exist; otherwise false.
      */
-    protected function remoteBranchExist()
+    protected function remoteBranchExist() : bool
     {
         $task = $this->getGitBuildStack()
             ->exec("ls-remote --exit-code --heads {$this->getRepo()} {$this->getBranch()}");
@@ -333,7 +335,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The path to the version file in the build directory.
      */
-    protected function getBuildVersionFile()
+    protected function getBuildVersionFile() : string
     {
         return "{$this->getBuildDir()}/VERSION";
     }
@@ -344,7 +346,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return \Robo\Task\Vcs\GitStack
      *   Get the GIT build stack instance.
      */
-    protected function getGitBuildStack()
+    protected function getGitBuildStack() : GitStack
     {
         return $this->taskGitStack()->dir($this->getBuildDir());
     }

@@ -13,7 +13,7 @@ interface GitDeployTypeInterface
      * @return string
      *   The the GIT repository.
      */
-    public function getRepo();
+    public function getRepo() : string;
 
     /**
      * Get the GIT origin.
@@ -21,7 +21,7 @@ interface GitDeployTypeInterface
      * @return string
      *   Return the GIT origin.
      */
-    public function getOrigin();
+    public function getOrigin() : string;
 
     /**
      * Get the GIT branch.
@@ -29,5 +29,5 @@ interface GitDeployTypeInterface
      * @return string
      *   Return the GIT branch.
      */
-    public function getBranch();
+    public function getBranch() : string;
 }

@@ -18,7 +18,7 @@ interface DeployTypeInterface
      * @return array
      *   An array of deploy type options.
      */
-    public function getOptions();
+    public function getOptions() : array;
 
     /**
      * Set deploy command options.
@@ -26,5 +26,5 @@ interface DeployTypeInterface
      * @return array
      *   An array of \Symfony\Component\Console\Input\InputOption.
      */
-    public static function deployOptions();
+    public static function deployOptions() : array;
 }
