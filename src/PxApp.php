@@ -435,7 +435,7 @@ class PxApp extends Application
     ) : array {
         $commands = [];
         $interface = PluginCommandRegisterInterface::class;
-        $configurations = PxApp::getConfiguration()->get('plugins');
+        $configurations = PxApp::getConfiguration()->get('plugins') ?? [];
 
         foreach ($plugin_manager->loadInstancesWithInterface($interface, $configurations) as $pluginInstance) {
             $commands[] = static::discoverPluginCommandClasses($pluginInstance);
