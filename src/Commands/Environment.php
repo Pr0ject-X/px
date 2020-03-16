@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pr0jectX\Px\Commands;
 
-use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
+use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Pr0jectX\Px\PxApp;
-use Droath\RoboDDev\Task\loadTasks as DDevTasks;
 use Pr0jectX\Px\CommandTasksBase;
 
 /**
@@ -12,16 +13,12 @@ use Pr0jectX\Px\CommandTasksBase;
  */
 class Environment extends CommandTasksBase
 {
-    use DDevTasks;
-
     /**
      * Initialize the project environment.
      */
     public function envInit()
     {
         $this->createInstance()->init();
-
-        return $this;
     }
 
     /**
@@ -30,28 +27,26 @@ class Environment extends CommandTasksBase
     public function envInfo()
     {
         $this->createInstance()->info();
-
-        return $this;
     }
 
     /**
      * Start the project environment.
+     *
+     * @aliases env:up
      */
     public function envStart()
     {
         $this->createInstance()->start();
-
-        return $this;
     }
 
     /**
      * Stop the project environment.
+     *
+     * @aliases env:down, env:halt
      */
     public function envStop()
     {
         $this->createInstance()->stop();
-
-        return $this;
     }
 
     /**
@@ -60,8 +55,6 @@ class Environment extends CommandTasksBase
     public function envRestart()
     {
         $this->createInstance()->restart();
-
-        return $this;
     }
 
     /**
@@ -70,71 +63,52 @@ class Environment extends CommandTasksBase
     public function envDestroy()
     {
         $this->createInstance()->destroy();
-
-        return $this;
     }
 
     /**
      * SSH into the project environment.
+     *
+     * @aliases ssh
      */
     public function envSsh()
     {
         $this->createInstance()->ssh();
+    }
 
-        return $this;
+    /**
+     * Launch the project environment in a browser.
+     *
+     * @param array $opts
+     * @option $schema
+     *   The URL protocol to use.
+     */
+    public function envLaunch(array $opts = ['schema' => 'http'])
+    {
+        $this->createInstance()->launch($opts);
     }
 
     /**
      * Execute command in the project environment.
      *
-     * @param $cmd
+     * @param string $cmd
      *   The command to execute.
-     *
-     * @return Environment
-     * @throws \Exception
      */
-    public function envExecute($cmd)
+    public function envExecute(string $cmd)
     {
         $this->createInstance()->exec($cmd);
-
-        return $this;
     }
 
     /**
      * Create the environment instance.
      *
-     * @param array $envConfig
+     * @param array $config
      *   An array of env configurations.
      *
-     * @return EnvironmentTypeInterface
-     *
-     * @throws \Exception
+     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
+     *   The environment plugin instance.
      */
-    protected function createInstance($envConfig = [])
+    protected function createInstance(array $config = []) : PluginInterface
     {
-        $config = PxApp::getConfiguration();
-
-        $envType = $config->has('environment.type')
-            ? $config->get('environment.type')
-            : null;
-
-        if (!isset($envType)) {
-            throw new \Exception(
-                sprintf('The %s environment type is not found.')
-            );
-        }
-
-        return $this->envTypePluginManager()
-            ->createInstance($envType, $envConfig);
-    }
-
-    /**
-     * Environment type plugin manager.
-     *
-     * @return \Pr0jectX\Px\EnvironmentTypePluginManager
-     */
-    protected function envTypePluginManager()
-    {
-        return PxApp::getContainer()->get('environmentTypePluginManager');
+        return Pxapp::getEnvironmentInstance($config);
     }
 }

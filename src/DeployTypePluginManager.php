@@ -2,6 +2,8 @@
 
 namespace Pr0jectX\Px;
 
+use Robo\ClassDiscovery\ClassDiscoveryInterface;
+
 /**
  * Define the deploy type plugin manager.
  */
@@ -10,15 +12,15 @@ class DeployTypePluginManager extends DefaultPluginManager
     /**
      * {@inheritDoc}
      */
-    public function discoverPluginClasses()
+    public function discover(ClassDiscoveryInterface $classDiscovery) : array
     {
-        /** @var \Robo\ClassDiscovery\RelativeNamespaceDiscovery $classDiscovery */
-        $classDiscovery = PxApp::service('relativeNamespaceDiscovery');
+        if (empty($this->pluginClasses)) {
+            $this->pluginClasses = $classDiscovery
+                ->setRelativeNamespace('ProjectX\Plugin\DeployType')
+                ->setSearchPattern('/.*DeployType?\.php$/')
+                ->getClasses();
+        }
 
-        $classDiscovery
-            ->setRelativeNamespace('ProjectX\Plugin\DeployType')
-            ->setSearchPattern('/.*DeployType?\.php$/');
-
-        return $classDiscovery->getClasses();
+        return $this->pluginClasses;
     }
 }

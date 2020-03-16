@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pr0jectX\Px;
 
 use Robo\ClassDiscovery\ClassDiscoveryInterface;
 
 /**
- * Define the environment type plugin manager.
+ * Define the command type plugin manager.
  */
-class EnvironmentTypePluginManager extends DefaultPluginManager
+class CommandTypePluginManager extends DefaultPluginManager
 {
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function discover(ClassDiscoveryInterface $classDiscovery) : array
     {
         if (empty($this->pluginClasses)) {
             $this->pluginClasses = $classDiscovery
-                ->setRelativeNamespace('ProjectX\Plugin\EnvironmentType')
-                ->setSearchPattern('/.*EnvironmentType?\.php$/')
+                ->setRelativeNamespace('ProjectX\Plugin\CommandType')
+                ->setSearchPattern('/.*CommandType?\.php$/')
                 ->getClasses();
         }
 

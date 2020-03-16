@@ -40,7 +40,7 @@ class Artifact extends CommandTasksBase
         'remove-submodules' => [],
         'search-submodules-depth' => 1
     ]) {
-        $projectRoot = $this->projectRootPath();
+        $projectRoot = PxApp::projectRootPath();
         $buildRoot = "{$projectRoot}/{$opts['build-dir']}";
 
         if (file_exists($buildRoot)) {

@@ -13,7 +13,7 @@ class Core extends CommandTasksBase
     use CommonCommandTrait;
 
     /**
-     * Add the CLI project-x function to your shell (e.g .bashrc, .zshrc).
+     * Add the CLI integration into your shell (e.g .bashrc, .zshrc).
      */
     public function coreCliShortcut ()
     {
@@ -25,27 +25,25 @@ class Core extends CommandTasksBase
             );
         }
 
-        $addShortcut = $this->confirm(
-            sprintf('Add the project-x function to %s?', $userShellRcFile),
-            true
+        $continue = $this->confirm(
+            sprintf('Add the CLI integration to %s?', $userShellRcFile), true
         );
 
-        if ($addShortcut) {
-            $templateFile = APPLICATION_ROOT . '/templates/core/shortcut.txt';
-            $templateContents = file_get_contents($templateFile);
-
-            $this->taskWriteToFile($userShellRcFile)
+        if ($continue) {
+            $result = $this->taskWriteToFile($userShellRcFile)
                 ->append()
-                ->appendUnlessMatches('/function px\(\)\n{/', $templateContents)
+                ->appendUnlessMatches('/function px\(\)\n{/', $this->getShortcutContents())
                 ->run();
 
-            $this->success(sprintf(
-                'Successfully added the project-x function to %s.',
-                $userShellRcFile
-            ))->info(sprintf(
-                'Run `source %s` to finalize the process.',
-                $userShellRcFile
-            ));
+            if ($result->wasSuccessful()) {
+                $this->success(sprintf(
+                    'Successfully added the px function to %s.', $userShellRcFile
+                ));
+
+                $this->note(sprintf(
+                    'Run `source %s` to finalize the process.', $userShellRcFile
+                ));
+            }
         }
     }
 
@@ -55,7 +53,7 @@ class Core extends CommandTasksBase
      * @return string|null
      *   The host environment user home.
      */
-    protected function getUserHome()
+    protected function getUserHome() : string
     {
         return getenv('HOME') ?: NULL;
     }
@@ -66,7 +64,7 @@ class Core extends CommandTasksBase
      * @return string|null
      *   The host environment user shell.
      */
-    protected function getUserShell()
+    protected function getUserShell() : string
     {
         $shell = getenv('SHELL');
 
@@ -81,8 +79,19 @@ class Core extends CommandTasksBase
      * @return string
      *   The host environment user shell RC filepath.
      */
-    protected function getUserShellRcFile()
+    protected function getUserShellRcFile() : string
     {
         return "{$this->getUserHome()}/.{$this->getUserShell()}rc";
+    }
+
+    /**
+     * Get the shortcut contents.
+     *
+     * @return string
+     *   The CLI shortcut contents.
+     */
+    protected function getShortcutContents() : string
+    {
+        return file_get_contents(APPLICATION_ROOT . '/templates/core/shortcut.txt');
     }
 }

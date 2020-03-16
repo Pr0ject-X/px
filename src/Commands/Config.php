@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pr0jectX\Px\Commands;
 
 use Pr0jectX\Px\CommandTasksBase;
+use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\PxApp;
-use Pr0jectX\Px\QuestionSet\EnvironmentQuestions;
-use Pr0jectX\Px\QuestionSet\QuestionCollection;
 
 /**
  * Define the configuration command.
@@ -13,55 +14,69 @@ use Pr0jectX\Px\QuestionSet\QuestionCollection;
 class Config extends CommandTasksBase
 {
     /**
-     * Set the project configuration.
+     * Set the project plugin configuration.
      *
      * @param $name
-     *   The configuration name.
+     *   The plugin configuration name.
      *
      * @throws \Exception
      */
     public function configSet($name = null)
     {
+        print PxApp::displayBanner();
+
         if (!isset($name)) {
             $name = $this->choice(
-                'Configuration to set?', $this->configOptions()
+                'Set plugin configuration for', $this->configOptions()
             );
         }
-        $config = $this->buildConfiguration($name);
 
-       if (!empty($config)) {
-           PxApp::getConfiguration()
-               ->set($name, $config)
-               ->save();
+       if ($config = $this->buildPluginConfiguration($name)) {
+           if ($status = $this->savePluginConfiguration($config)) {
+               $this->success(
+                   sprintf('The %s plugin configuration has successfully been saved.', $name)
+               );
+           }
        }
     }
 
     /**
-     * Define the configuration router.
+     * Define the plugin configuration router.
      *
      * @return array
-     *   An array of configurations.
+     *   An array of plugin configuration router details.
      */
-    protected function configRouter()
+    protected function configPluginRouter() : array
     {
-        return [
+        $router = [
             'environment' => [
-                'class' => EnvironmentQuestions::class
-            ]
+                'class' => PxApp::getEnvironmentInstance()
+            ],
         ];
+        $interface = PluginConfigurationBuilderInterface::class;
+
+        /** @var \Pr0jectX\Px\PluginManagerInterface $pluginManager */
+        $pluginManager = PxApp::service('commandTypePluginManager');
+
+        /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface $pluginInstance */
+        foreach ($pluginManager->loadInstancesWithInterface($interface) as $pluginId => $pluginInstance) {
+            $router[$pluginId]['class'] = $pluginInstance;
+        }
+
+        return $router;
     }
 
     /**
-     * An array of configuration options.
+     * An array of plugin configuration options.
      *
      * @return array
-     *   An array of configuration options.
+     *   An array of plugin configuration options.
      */
-    protected function configOptions()
+    protected function configOptions() : array
     {
         $options = [];
 
-        foreach (array_keys($this->configRouter()) as $name) {
+        foreach (array_keys($this->configPluginRouter()) as $name) {
             $options[] = $name;
         }
 
@@ -69,7 +84,7 @@ class Config extends CommandTasksBase
     }
 
     /**
-     * Build configuration array.
+     * Build plugin configuration array.
      *
      * @param $name
      *   The configuration name.
@@ -79,45 +94,32 @@ class Config extends CommandTasksBase
      *
      * @throws \Exception
      */
-    protected function buildConfiguration($name)
+    protected function buildPluginConfiguration($name) : array
     {
         $config = [];
 
-        foreach ($this->loadQuestions($name) as $type => $question) {
-            $config[$type] = $this->doAsk($question);
+        if ($this->configPluginRouter()[$name]) {
+            $pluginInstance = $this->configPluginRouter()[$name]['class'];
+
+            if ($pluginInstance instanceof PluginConfigurationBuilderInterface) {
+                $config[$name] = $pluginInstance->pluginConfiguration()->build();
+            }
         }
 
         return $config;
     }
 
     /**
-     * Load the config router questions.
+     * Save the plugin configurations.
      *
-     * @param $name
-     *   The configuration name.
+     * @param array $configurations
+     *   An array of the plugin configurations.
      *
-     * @return QuestionCollection
-     *   The question collection instance.
-     *
-     * @throws \Exception
+     * @return bool
+     *   Return true if the configurations were saved; otherwise false.
      */
-    protected function loadQuestions($name)
+    protected function savePluginConfiguration(array $configurations) : bool
     {
-        $router = $this->configRouter();
-
-        if (!isset($router[$name])) {
-            throw new \Exception(
-                sprintf('The %s is not a valid config name.', $name)
-            );
-        }
-        $classname = $router[$name]['class'];
-
-        if (!class_exists($classname)) {
-            throw new \Exception(
-                sprintf('The %s class name does not exist.', $classname)
-            );
-        }
-
-        return (new $classname)->questions();
+        return PxApp::getConfiguration()->set('plugins', $configurations)->save();
     }
 }

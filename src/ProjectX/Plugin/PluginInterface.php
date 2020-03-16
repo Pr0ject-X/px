@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pr0jectX\Px\ProjectX\Plugin;
 
 /**
@@ -13,7 +15,7 @@ interface PluginInterface
      * @return string
      *   The plugin identifier.
      */
-    public static function pluginId();
+    public static function pluginId() : string;
 
     /**
      * Define the plugin label.
@@ -21,7 +23,7 @@ interface PluginInterface
      * @return string
      *   The plugin human readable label.
      */
-    public static function pluginLabel();
+    public static function pluginLabel() : string;
 
     /**
      * Get plugin configurations.
@@ -29,5 +31,5 @@ interface PluginInterface
      * @return array
      *   An array of the plugin configurations.
      */
-    public function getConfigurations();
+    public function getConfigurations() : array;
 }

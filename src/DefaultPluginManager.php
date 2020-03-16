@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pr0jectX\Px;
 
 use Pr0jectX\Px\Exception\PluginNotFoundException;
-use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use League\Container\ContainerAwareInterface;
+use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Robo\ClassDiscovery\ClassDiscoveryInterface;
 use Robo\Collection\CollectionBuilder;
 use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\IOAwareInterface;
+use Symfony\Component\Console\Input\Input;
+use Symfony\Component\Console\Output\Output;
 
 /**
  * Define the default plugin manager.
@@ -16,45 +20,73 @@ use Robo\Contract\IOAwareInterface;
 abstract class DefaultPluginManager implements PluginManagerInterface
 {
     /**
-     * @var \Robo\ClassDiscovery\ClassDiscoveryInterface
+     * @var \Symfony\Component\Console\Input\Input
      */
-    protected $classDiscovery;
+    protected $input;
+
+    /**
+     * @var \Symfony\Component\Console\Output\Output
+     */
+    protected $output;
+
+    /**
+     * @var array
+     */
+    protected $pluginClasses = [];
+
+    /**
+     * @var array
+     */
+    protected static $pluginInstances = [];
 
     /**
      * Define the default plugin manager constructor.
      *
+     * @param \Symfony\Component\Console\Input\Input $input
+     *   The symfony console input.
+     * @param \Symfony\Component\Console\Output\Output $output
+     *   The symfony console output.
      * @param \Robo\ClassDiscovery\ClassDiscoveryInterface $class_discovery
      *   The class discovery service.
      */
-    public function __construct(ClassDiscoveryInterface $class_discovery)
+    public function __construct(
+        Input $input,
+        Output $output,
+        ClassDiscoveryInterface $class_discovery
+    )
     {
-        $this->classDiscovery = $class_discovery;
+        $this->input = $input;
+        $this->output = $output;
+        $this->discover($class_discovery);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getClassname($plugin_id)
+    public function getClassname(string $plugin_id) : string
     {
         return $this->findPluginById(
             $plugin_id,
-            $this->discoverPluginClasses()
+            $this->pluginClasses
         );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getOptions()
+    public function getOptions(array $exclude_ids = []) : array
     {
         $options = [];
 
         /** @var PluginInterface $className */
-        foreach ($this->discoverPluginClasses() as $className) {
-            if (!is_subclass_of($className, PluginInterface::class)) {
+        foreach ($this->pluginClasses as $className) {
+            $pluginId = $className::pluginId();
+
+            if (in_array($pluginId, $exclude_ids)
+                || !is_subclass_of($className, PluginInterface::class)) {
                 continue;
             }
-            $options[$className::pluginId()] = $className::pluginLabel();
+            $options[$pluginId] = $className::pluginLabel();
         }
 
         return $options;
@@ -63,40 +95,101 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function createInstance($plugin_id, array $configurations = [])
-    {
-        $class_name = $this->getClassname($plugin_id);
+    public function createInstance(
+        string $plugin_id,
+        array $configurations = []
+    ) : PluginInterface {
+        $pluginArgHash = serialize($configurations);
+        $pluginCacheId = sha1("{$plugin_id}:{$pluginArgHash}");
 
-        if (!$class_name) {
-            throw new PluginNotFoundException($plugin_id);
-        }
-        /** @var PluginInterface $instance */
-        $instance = new $class_name($configurations);
-
-        $container = PxApp::getContainer();
-
-        if ($instance instanceof IOAwareInterface) {
-            $instance->setInput($container->get('input'));
-            $instance->setOutput($container->get('output'));
-        }
-
-        if ($instance instanceof ContainerAwareInterface) {
-            $instance->setContainer($container);
-        }
-
-        if ($instance instanceof BuilderAwareInterface) {
-            $instance->setBuilder(
-                CollectionBuilder::create($container, $instance)
+        if (!isset(static::$pluginInstances[$pluginCacheId])) {
+            static::$pluginInstances[$pluginCacheId] = $this->instantiatePluginInstance(
+                $plugin_id, $configurations
             );
         }
 
-        return $instance;
+        return static::$pluginInstances[$pluginCacheId];
+    }
+
+    /**
+     * Load plugin instance with interface.
+     *
+     * @param string $interface
+     *   The fully qualified interface name.
+     * @param array $configurations
+     *   An array of plugin configurations keyed by the plugin id.
+     *
+     * @return array
+     *   An array of plugin instances that match the defined interface.
+     */
+    public function loadInstancesWithInterface(
+        string $interface,
+        array $configurations = []
+    ) : array {
+        $instances = [];
+
+        foreach ($this->pluginClasses as $classname) {
+            if (!is_subclass_of($classname, $interface)) {
+                continue;
+            }
+            $pluginId = $classname::PluginId();
+            $pluginConfig = $configurations[$pluginId] ?? [];
+
+            $instances[$pluginId] = $this->createInstance(
+                $pluginId, $pluginConfig
+            );
+        }
+
+        return $instances;
+    }
+
+    /**
+     * Instantiate plugin instance.
+     *
+     * @param string $plugin_id
+     *   The plugin identifier.
+     * @param array $configurations
+     *   An array of plugin configurations.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
+     *
+     * @throws \Pr0jectX\Px\Exception\PluginNotFoundException
+     */
+    protected function instantiatePluginInstance(
+        string $plugin_id,
+        array $configurations
+    ) : PluginInterface {
+        if ($classname = $this->getClassname($plugin_id)) {
+
+            /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $instance */
+            $instance = new $classname($this, $configurations);
+
+            if ($instance instanceof IOAwareInterface) {
+                $instance->setInput($this->input);
+                $instance->setOutput($this->output);
+            }
+            $container = PxApp::getContainer();
+
+            if ($instance instanceof ContainerAwareInterface) {
+                $instance->setContainer($container);
+            }
+
+            if ($instance instanceof BuilderAwareInterface) {
+                $instance->setBuilder(
+                    CollectionBuilder::create($container, $instance)
+                );
+            }
+
+            return $instance;
+        }
+
+        throw new PluginNotFoundException($plugin_id);
     }
 
     /**
      * Find plugin by identifier.
      *
-     * @param $plugin_id
+     * @param string $plugin_id
      *   The plugin identifier.
      * @param array $plugins
      *   An array of plugins.
@@ -104,7 +197,8 @@ abstract class DefaultPluginManager implements PluginManagerInterface
      * @return bool|string
      *   Return a plugin class name; otherwise false if not found.
      */
-    protected function findPluginById($plugin_id, array $plugins) {
+    protected function findPluginById(string $plugin_id, array $plugins)
+    {
         $interface = PluginInterface::class;
 
         /** @var \Pr0jectX\Px\PluginInterface $class_name */
