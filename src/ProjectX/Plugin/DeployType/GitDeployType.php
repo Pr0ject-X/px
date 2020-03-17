@@ -3,6 +3,7 @@
 namespace Pr0jectX\Px\ProjectX\Plugin\DeployType;
 
 use Pr0jectX\Px\Deploy\GitDeploy;
+use Robo\Collection\CollectionBuilder;
 use Robo\Task\Vcs\GitStack;
 use Symfony\Component\Console\Input\InputOption;
 use Pr0jectX\Px\Exception\DeployTypeOptionRequired;
@@ -343,10 +344,10 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * Get the GIT build stack instance.
      *
-     * @return \Robo\Task\Vcs\GitStack
+     * @return \Robo\Collection\CollectionBuilder
      *   Get the GIT build stack instance.
      */
-    protected function getGitBuildStack() : GitStack
+    protected function getGitBuildStack() : CollectionBuilder
     {
         return $this->taskGitStack()->dir($this->getBuildDir());
     }
