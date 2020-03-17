@@ -31,13 +31,13 @@ class Config extends CommandTasksBase
             );
         }
 
-       if ($config = $this->buildPluginConfiguration($name)) {
+        if ($config = $this->buildPluginConfiguration($name)) {
            if ($status = $this->savePluginConfiguration($config)) {
                $this->success(
                    sprintf('The %s plugin configuration has successfully been saved.', $name)
                );
            }
-       }
+        }
     }
 
     /**
@@ -98,12 +98,16 @@ class Config extends CommandTasksBase
     {
         $config = [];
 
-        if ($this->configPluginRouter()[$name]) {
+        if (isset($this->configPluginRouter()[$name])) {
             $pluginInstance = $this->configPluginRouter()[$name]['class'];
 
             if ($pluginInstance instanceof PluginConfigurationBuilderInterface) {
                 $config[$name] = $pluginInstance->pluginConfiguration()->build();
             }
+        } else {
+            throw new \RuntimeException(
+                sprintf('The configuration key "%s" is invalid!', $name)
+            );
         }
 
         return $config;
