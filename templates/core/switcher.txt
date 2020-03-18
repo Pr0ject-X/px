@@ -1,0 +1,15 @@
+## Automatically added the px-switch function by the project-x utility.
+function px-switch()
+{
+    PROJECT_DIR=$(px core:switch --raw);
+
+    if [[ -n "$PROJECT_DIR" ]]; then
+        px env:down
+        cd "$(echo "$PROJECT_DIR"|tr -d '\n')";
+        px env:up
+        return 0;
+    fi
+
+    echo "You're working on this project already!"
+    return 1;
+}

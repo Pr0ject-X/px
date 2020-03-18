@@ -150,6 +150,17 @@ class PxApp extends Application
     }
 
     /**
+     * Define the project-x global temporary directory.
+     *
+     * @return string
+     *   The fully qualified path to the global temporary directory.
+     */
+    public static function globalTempDir() : string
+    {
+        return "{$_SERVER['HOME']}/.project-x";
+    }
+
+    /**
      * Define the project-x temporary directory.
      *
      * @return string

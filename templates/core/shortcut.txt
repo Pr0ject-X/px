@@ -1,4 +1,4 @@
-# Automatically added by the project-x utility.
+## Automatically added the px function by the project-x utility.
 function px()
 {
   if [ "`git rev-parse --show-cdup 2> /dev/null`" != "" ]; then
