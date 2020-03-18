@@ -40,6 +40,21 @@ class Environment extends CommandTasksBase
     }
 
     /**
+     * @hook post-command env:start
+     */
+    public function postEnvStart()
+    {
+        if ($this->confirm('Launch the environment?', true)) {
+            /** @var \Symfony\Component\Console\Application $applicaiton */
+            $application = PxApp::service('application');
+
+            if ($command = $application->find('env:launch')) {
+                $this->taskSymfonyCommand($command)->run();
+            }
+        }
+    }
+
+    /**
      * Stop the project environment.
      *
      * @aliases env:down, env:halt
