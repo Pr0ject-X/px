@@ -6,6 +6,7 @@ namespace Pr0jectX\Px;
 
 use Composer\Autoload\ClassLoader;
 use Consolidation\Config\ConfigInterface;
+use League\Container\ContainerAwareInterface;
 use League\Container\ContainerInterface;
 use Pr0jectX\Px\Commands\Artifact;
 use Pr0jectX\Px\Commands\Config;
@@ -14,10 +15,12 @@ use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandRegisterInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandTaskBase;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
+use Robo\Collection\CollectionBuilder;
+use Robo\Contract\BuilderAwareInterface;
+use Robo\Contract\IOAwareInterface;
 use Robo\Robo;
 use Robo\Runner;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -255,7 +258,7 @@ class PxApp extends Application
      */
     public static function composerHasPackage(string $package) : bool
     {
-        return isset(static::$projectComposer['require'][$package]);
+        return isset(static::getProjectComposer()['require'][$package]);
     }
 
     /**
@@ -395,6 +398,27 @@ class PxApp extends Application
     }
 
     /**
+     * Get the instantiated plugin command instance.
+     *
+     * @param \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin
+     *   The plugin instance.
+     * @param string $classname
+     *   The command classname.
+     *
+     * @return \Pr0jectX\Px\CommandTasksBase
+     */
+    protected static function pluginCommandFactory(
+        PluginInterface $plugin,
+        string $classname
+    ) : CommandTasksBase {
+        if (is_subclass_of($classname, PluginCommandTaskBase::class)) {
+            return new $classname($plugin);
+        }
+
+        return new $classname();
+    }
+
+    /**
      * Discover plugin instance registered command classes.
      *
      * @param \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin
@@ -413,9 +437,24 @@ class PxApp extends Application
                     || !is_subclass_of($command, CommandTasksBase::class)) {
                     continue;
                 }
-                $classes[] = is_subclass_of($command, PluginCommandTaskBase::class)
-                    ? new $command($plugin)
-                    : new $command();
+                $instance = static::pluginCommandFactory($plugin, $command);
+
+                if ($instance instanceof IOAwareInterface) {
+                    $instance->setInput(PxApp::service('input'));
+                    $instance->setOutput(PxApp::service('output'));
+                }
+                $container = PxApp::getContainer();
+
+                if ($instance instanceof ContainerAwareInterface) {
+                    $instance->setContainer($container);
+                }
+
+                if ($instance instanceof BuilderAwareInterface) {
+                    $instance->setBuilder(
+                        CollectionBuilder::create($container, $instance)
+                    );
+                }
+                $classes[] = $instance;
             }
         }
 
