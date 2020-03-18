@@ -15,38 +15,59 @@ interface EnvironmentTypeInterface extends PluginInterface, PluginConfigurationB
 {
     /**
      * Initial the environment.
+     *
+     * @param array $opts
+     *   An array of start options.
      */
-    public function init();
+    public function init(array $opts = []);
 
     /**
      * Start the environment.
+     *
+     * @param array $opts
+     *   An array of start options.
      */
-    public function start();
+    public function start(array $opts = []);
 
     /**
      * Stop the environment.
+     *
+     * @param array $opts
+     *   An array of stop options.
      */
-    public function stop();
+    public function stop(array $opts = []);
 
     /**
      * Restart the environment.
+     *
+     * @param array $opts
+     *   An array of restart options.
      */
-    public function restart();
+    public function restart(array $opts = []);
 
     /**
      * Destroy the environment.
+     *
+     * @param array $opts
+     *   An array of destroy options.
      */
-    public function destroy();
+    public function destroy(array $opts = []);
 
     /**
      * Display environment information.
+     *
+     * @param array $opts
+     *   An array of info options.
      */
-    public function info();
+    public function info(array $opts = []);
 
     /**
      * Connection to the environment using SSH.
+     *
+     * @param array $opts
+     *   An array of ssh options.
      */
-    public function ssh();
+    public function ssh(array $opts = []);
 
     /**
      * Execute a command on the environment.
@@ -59,10 +80,10 @@ interface EnvironmentTypeInterface extends PluginInterface, PluginConfigurationB
     /**
      * Launch the environment application.
      *
-     * @param array $options
+     * @param array $opts
      *   An array of launch options.
      */
-    public function launch(array $options = []);
+    public function launch(array $opts = []);
 
     /**
      * Define the environment application root.

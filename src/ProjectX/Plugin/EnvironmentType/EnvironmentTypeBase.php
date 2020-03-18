@@ -18,7 +18,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function init()
+    public function init(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -26,7 +26,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function start()
+    public function start(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -34,7 +34,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function stop()
+    public function stop(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -42,7 +42,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function restart()
+    public function restart(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -50,7 +50,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function destroy()
+    public function destroy(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -58,7 +58,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function info()
+    public function info(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -74,7 +74,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function launch(array $options = [])
+    public function launch(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -82,7 +82,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function ssh()
+    public function ssh(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
