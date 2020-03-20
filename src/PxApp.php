@@ -6,6 +6,7 @@ namespace Pr0jectX\Px;
 
 use Composer\Autoload\ClassLoader;
 use Consolidation\Config\ConfigInterface;
+use League\Container\Container;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerInterface;
 use Pr0jectX\Px\Commands\Artifact;
@@ -83,15 +84,13 @@ class PxApp extends Application
         $this->input = $input;
         $this->output = $output;
 
-        static::$container = Robo::createDefaultContainer(
+        static::createContainer(
             $input,
             $output,
             $this,
             static::getConfiguration(),
             $classloader
         );
-
-        static::setContainer();
         static::setProjectComposer();
     }
 
@@ -122,6 +121,18 @@ class PxApp extends Application
     {
         return file_get_contents(dirname(__DIR__) . '/VERSION')
             ?? '0.0.0';
+    }
+
+    /**
+     * Determine if hte contain exist.
+     *
+     * @return bool
+     *   Return true if the container exist and is valid; otherwise false.
+     */
+    public static function hasContainer() : bool
+    {
+        return isset(static::$container)
+            && static::$container instanceof ContainerInterface;
     }
 
     /**
@@ -310,6 +321,57 @@ class PxApp extends Application
     }
 
     /**
+     * Create the project-x dependency injection container.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     *   The console input stream.
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *   The console output stream.
+     * @param \Symfony\Component\Console\Application $app
+     *   The console application.
+     * @param \Consolidation\Config\ConfigInterface $config
+     *   The console configuration.
+     * @param $classLoader
+     *   The console class loader.
+     *
+     * @return \League\Container\ContainerInterface
+     *   The instantiated dependency injection container.
+     */
+    protected static function createContainer(
+        InputInterface $input,
+        OutputInterface $output,
+        Application $app,
+        ConfigInterface $config,
+        $classLoader
+    )
+    {
+        if (!static::hasContainer()) {
+            $container = new Container();
+
+            Robo::configureContainer($container, $app, $config, $input, $output, $classLoader);
+
+            $container->share('deployTypePluginManager', DeployTypePluginManager::class)
+                ->withArguments([
+                    'input', 'output', 'relativeNamespaceDiscovery'
+                ]);
+            $container->share('commandTypePluginManager', CommandTypePluginManager::class)
+                ->withArguments([
+                    'input', 'output', 'relativeNamespaceDiscovery'
+                ]);
+            $container->share('environmentTypePluginManager', EnvironmentTypePluginManager::class)
+                ->withArguments([
+                    'input', 'output', 'relativeNamespaceDiscovery'
+                ]);
+
+            $app->setDispatcher($container->get('eventDispatcher'));
+
+            static::$container = $container;
+        }
+
+        return static::$container;
+    }
+
+    /**
      * Set the project-x composer.json file contents.
      *
      * @throws \RuntimeException
@@ -327,27 +389,6 @@ class PxApp extends Application
         static::$projectComposer = json_decode(
             file_get_contents($composerFile), true
         );
-    }
-
-    /**
-     * Set the project-x container with shared services.
-     */
-    protected static function setContainer()
-    {
-        $container = static::$container;
-
-        $container->share('deployTypePluginManager', DeployTypePluginManager::class)
-            ->withArguments([
-                'input', 'output', 'relativeNamespaceDiscovery'
-            ]);
-        $container->share('commandTypePluginManager', CommandTypePluginManager::class)
-            ->withArguments([
-                'input', 'output', 'relativeNamespaceDiscovery'
-            ]);
-        $container->share('environmentTypePluginManager', EnvironmentTypePluginManager::class)
-            ->withArguments([
-                'input', 'output', 'relativeNamespaceDiscovery'
-            ]);
     }
 
     /**
@@ -507,7 +548,7 @@ class PxApp extends Application
      */
     protected static function findFileRootPath($filename, $search_path = NULL)
     {
-        if (!isset($search_path) || file_exists($search_path)) {
+        if (!isset($search_path) || !file_exists($search_path)) {
             $search_path = getcwd();
         }
         $paths = [];
