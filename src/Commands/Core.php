@@ -278,12 +278,12 @@ class Core extends CommandTasksBase
      */
     protected function saveGlobalProject(array $data) : bool
     {
-        $contents = file_put_contents(
-            $this->globalProjectFilename(),
-            json_encode($data, JSON_PRETTY_PRINT)
-        );
+        $results = $this
+            ->taskWriteToFile($this->globalProjectFilename())
+            ->text(json_encode($data, JSON_PRETTY_PRINT))
+            ->run();
 
-        return $contents !== false;
+        return $results->wasSuccessful();
     }
 
     /**

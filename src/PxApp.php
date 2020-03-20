@@ -373,7 +373,7 @@ class PxApp extends Application
      */
     protected static function createConfiguration() : ConfigInterface
     {
-        $config = new \Pr0jectX\Px\Config\Config();
+        $config = new \Robo\Config\Config();
 
         Robo::loadConfiguration(
             static::configPaths(), $config

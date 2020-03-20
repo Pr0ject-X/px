@@ -7,6 +7,7 @@ namespace Pr0jectX\Px\Commands;
 use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\PxApp;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Define the configuration command.
@@ -32,7 +33,7 @@ class Config extends CommandTasksBase
         }
 
         if ($config = $this->buildPluginConfiguration($name)) {
-           if ($status = $this->savePluginConfiguration($config)) {
+           if ($this->savePluginConfiguration($config)) {
                $this->success(
                    sprintf('The %s plugin configuration has successfully been saved.', $name)
                );
@@ -124,6 +125,17 @@ class Config extends CommandTasksBase
      */
     protected function savePluginConfiguration(array $configurations) : bool
     {
-        return PxApp::getConfiguration()->set('plugins', $configurations)->save();
+        $projectRoot = PxApp::projectRootPath();
+        $configFilename = PxApp::CONFIG_FILENAME;
+
+        $pluginConfig = PxApp::getConfiguration()
+            ->set('plugins', $configurations)
+            ->export();
+
+        $results = $this->taskWriteToFile("{$projectRoot}/{$configFilename}.yml")
+            ->text(Yaml::dump($pluginConfig, 10, 4))
+            ->run();
+
+        return $results->wasSuccessful();
     }
 }
