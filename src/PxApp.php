@@ -60,6 +60,11 @@ class PxApp extends Application
     protected static $container;
 
     /**
+     * @var string
+     */
+    protected static $projectRootPath;
+
+    /**
      * @var array
      */
     protected static $projectComposer;
@@ -190,7 +195,13 @@ class PxApp extends Application
      */
     public static function projectRootPath() : string
     {
-        return static::findFileRootPath('composer.json');
+        if (!isset(static::$projectRootPath)) {
+            static::$projectRootPath = static::findFileRootPath(
+                'composer.json'
+            );
+        }
+
+        return static::$projectRootPath;
     }
 
     /**
@@ -400,9 +411,11 @@ class PxApp extends Application
     protected static function configPaths() : array
     {
         $filename = static::CONFIG_FILENAME;
+        $rootPath = static::projectRootPath();
+
         return [
-            "{$filename}.yml",
-            "{$filename}.local.yml",
+            "{$rootPath}/{$filename}.yml",
+            "{$rootPath}/{$filename}.local.yml",
         ];
     }
 
@@ -540,25 +553,28 @@ class PxApp extends Application
      *
      * @param $filename
      *   The file name.
-     * @param string $search_path
+     * @param string $searchPath
      *   The directory search path.
      *
      * @return boolean|string
      *   The root path to the given file name.
      */
-    protected static function findFileRootPath($filename, $search_path = NULL)
+    protected static function findFileRootPath($filename, $searchPath = NULL)
     {
-        if (!isset($search_path) || !file_exists($search_path)) {
-            $search_path = getcwd();
+        if (!isset($searchPath) || !file_exists($searchPath)) {
+            $searchPath = getcwd();
         }
-        $paths = [];
 
-        foreach (explode('/', $search_path) as $directory) {
-            $paths[] = $directory;
-            $root_path = implode('/', $paths);
+        if (file_exists("{$searchPath}/{$filename}")) {
+            return $searchPath;
+        }
+        $searchDirs = explode('/', $searchPath);
 
-            if (file_exists("{$root_path}/{$filename}")) {
-                return $root_path;
+        for ($i = 1; $i < count($searchDirs) - 1; $i++) {
+            $searchDir = implode('/', array_slice($searchDirs, 0, -$i));
+
+            if (file_exists("{$searchDir}/{$filename}")) {
+                return $searchDir;
             }
         }
 
