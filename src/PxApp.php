@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px;
 
-use Composer\Autoload\ClassLoader;
-use Consolidation\Config\ConfigInterface;
 use League\Container\Container;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerInterface;
@@ -40,29 +38,9 @@ class PxApp extends Application
     const PLUGIN_NAMESPACE = 'ProjectX\Plugin';
 
     /**
-     * @var \Symfony\Component\Console\Input\InputInterface
-     */
-    protected $input;
-
-    /**
-     * @var \Symfony\Component\Console\Output\OutputInterface
-     */
-    protected $output;
-
-    /**
-     * @var \Robo\Config\Config
-     */
-    protected static $config;
-
-    /**
      * @var \League\Container\ContainerInterface
      */
     protected static $container;
-
-    /**
-     * @var string
-     */
-    protected static $projectRootPath;
 
     /**
      * @var array
@@ -70,33 +48,26 @@ class PxApp extends Application
     protected static $projectComposer;
 
     /**
-     * Define the project-x constructor.
-     *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     *   The console input stream.
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *   The console output stream.
-     * @param \Composer\Autoload\ClassLoader $classloader
-     *   The composer class loader instance.
+     * @var string
      */
-    public function __construct(
-        InputInterface $input,
-        OutputInterface $output,
-        ClassLoader $classloader = null
-    ) {
+    protected static $projectRootPath;
+
+    /**
+     * @var string
+     */
+    protected static $projectSearchPath;
+
+    /**
+     * @var EnvironmentTypeInterface
+     */
+    protected static $projectEnvironment;
+
+    /**
+     * Define the project-x constructor.
+     */
+    public function __construct()
+    {
         parent::__construct(static::displayBanner(), static::displayVersion());
-
-        $this->input = $input;
-        $this->output = $output;
-
-        static::createContainer(
-            $input,
-            $output,
-            $this,
-            static::getConfiguration(),
-            $classloader
-        );
-        static::setProjectComposer();
     }
 
     /**
@@ -109,11 +80,9 @@ class PxApp extends Application
     {
         $filename = dirname(__DIR__) . '/banner.txt';
 
-        if (!file_exists($filename)) {
-            return static::APPLICATION_NAME;
-        }
-
-        return file_get_contents($filename) ?? static::APPLICATION_NAME;
+        return file_exists($filename)
+            ? file_get_contents($filename)
+            : static::APPLICATION_NAME;
     }
 
     /**
@@ -129,206 +98,52 @@ class PxApp extends Application
     }
 
     /**
-     * Determine if hte contain exist.
+     * Set the project search path.
      *
-     * @return bool
-     *   Return true if the container exist and is valid; otherwise false.
+     * @param string $searchPath
+     *   The project search path to determine the root.
      */
-    public static function hasContainer() : bool
+    public static function setProjectSearchPath(string $searchPath) : void
     {
-        return isset(static::$container)
-            && static::$container instanceof ContainerInterface;
+        static::$projectSearchPath = getcwd();
+
+        if (file_exists($searchPath)) {
+            static::$projectSearchPath = $searchPath;
+        }
     }
 
     /**
-     * Get the project-x container.
+     * Load the composer.json relevant to the project root.
      *
-     * @return \League\Container\ContainerInterface
-     *   The project-x service container.
+     * @throws \RuntimeException
      */
-    public static function getContainer() : ContainerInterface
+    public static function loadProjectComposer() : void
     {
-        return static::$container;
+        $composerFile = static::projectRootPath() . '/composer.json';
+
+        if (!file_exists($composerFile)) {
+            throw new \RuntimeException(
+                'Unable to locate the composer.json within the project.'
+            );
+        }
+
+        static::$projectComposer = json_decode(
+            file_get_contents($composerFile), true
+        );
     }
 
     /**
-     * Load the container service by identifier.
+     * Load a service from the container by an identifier.
      *
      * @param $id
      *   The container service identifier.
      *
      * @return mixed
-     *   The service from the container.
+     *   The instantiated service from the container.
      */
     public static function service($id)
     {
         return static::$container->get($id);
-    }
-
-    /**
-     * Define the project-x global temporary directory.
-     *
-     * @return string
-     *   The fully qualified path to the global temporary directory.
-     */
-    public static function globalTempDir() : string
-    {
-        return "{$_SERVER['HOME']}/.project-x";
-    }
-
-    /**
-     * Define the project-x temporary directory.
-     *
-     * @return string
-     *   The fully qualified path to the project temporary directory.
-     */
-    public static function projectTempDir() : string
-    {
-        return static::projectRootPath() . '/.project-x';
-    }
-
-    /**
-     * Get the project-x root path.
-     *
-     * @return bool|string
-     *   The project root path; otherwise false if not found.
-     */
-    public static function projectRootPath() : string
-    {
-        if (!isset(static::$projectRootPath)) {
-            static::$projectRootPath = static::findFileRootPath(
-                'composer.json'
-            );
-        }
-
-        return static::$projectRootPath;
-    }
-
-    /**
-     * Define the project-x command classes.
-     *
-     * @return array
-     *   An array of core command classes.
-     */
-    public static function coreCommandClasses() : array
-    {
-        return array_merge([
-            Core::class,
-            Config::class,
-            Artifact::class
-        ], static::pluginCommandClasses());
-    }
-
-    /**
-     * The project-x environment instance.
-     *
-     * @param array $config
-     *   The configurations to pass along to the instance.
-     *
-     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
-     */
-    public static function getEnvironmentInstance(array $config = []) : EnvironmentTypeInterface
-    {
-        /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
-        $envManager = static::service('environmentTypePluginManager');
-
-        return $envManager->createInstance(
-            static::getEnvironmentType(), $config
-        );
-    }
-
-    /**
-     * Get the plugin environment type.
-     *
-     * @return string
-     *   The current plugin environment type.
-     */
-    public static function getEnvironmentType() : string
-    {
-        $configuration = static::getConfiguration();
-
-        return $configuration->has('plugins.environment.type')
-            ? (string) $configuration->get('plugins.environment.type')
-            : 'localhost';
-    }
-
-    /**
-     * Get project-x configuration.
-     *
-     * @return \Robo\Config\Config
-     *   The project-x configuration instance.
-     */
-    public static function getConfiguration()
-    {
-        $config = static::$config;
-
-        if (isset($config)) {
-            return $config;
-        }
-
-        return static::createConfiguration();
-    }
-
-    /**
-     * Get the project-x project composer.
-     *
-     * @return array
-     *   An array of composer.json definitions.
-     */
-    public static function getProjectComposer() : array
-    {
-        return static::$projectComposer;
-    }
-
-    /**
-     * Check if a package is defined in the project-x composer.json.
-     *
-     * @param string $package
-     *   The composer package name.
-     *
-     * @return bool
-     *   Return true if composer package exist; otherwise false.
-     */
-    public static function composerHasPackage(string $package) : bool
-    {
-        return isset(static::getProjectComposer()['require'][$package]);
-    }
-
-    /**
-     * Get the project-x application input.
-     *
-     * @return \Symfony\Component\Console\Input\InputInterface
-     */
-    public function input() : InputInterface
-    {
-        return $this->input;
-    }
-
-    /**
-     * Get the project-x application output.
-     *
-     * @return \Symfony\Component\Console\Output\OutputInterface
-     */
-    public function output() : OutputInterface
-    {
-        return $this->output;
-    }
-
-    /**
-     * Execute the project-x application.
-     *
-     * @return int
-     *   The project-x application status code.
-     */
-    public function execute() : int
-    {
-        $runner = (new Runner())
-            ->setContainer($this->getContainer())
-            ->setRelativePluginNamespace(static::PLUGIN_NAMESPACE);
-
-        return $runner->run(
-            $this->input(), $this->output(), $this, static::coreCommandClasses()
-        );
     }
 
     /**
@@ -340,24 +155,25 @@ class PxApp extends Application
      *   The console output stream.
      * @param \Symfony\Component\Console\Application $app
      *   The console application.
-     * @param \Consolidation\Config\ConfigInterface $config
-     *   The console configuration.
      * @param $classLoader
      *   The console class loader.
      *
      * @return \League\Container\ContainerInterface
      *   The instantiated dependency injection container.
      */
-    protected static function createContainer(
-        InputInterface $input,
-        OutputInterface $output,
+    public static function createContainer(
+        InputInterface $input = null,
+        OutputInterface $output = null,
         Application $app,
-        ConfigInterface $config,
         $classLoader
     )
     {
         if (!static::hasContainer()) {
             $container = new Container();
+
+            $config = Robo::createConfiguration(
+                PxApp::configPaths()
+            );
 
             Robo::configureContainer($container, $app, $config, $input, $output, $classLoader);
 
@@ -383,22 +199,173 @@ class PxApp extends Application
     }
 
     /**
-     * Set the project-x composer.json file contents.
+     * Get the project-x container.
      *
-     * @throws \RuntimeException
+     * @return \League\Container\ContainerInterface
+     *   The project-x service container.
      */
-    protected static function setProjectComposer()
+    public static function getContainer() : ContainerInterface
     {
-        $composerFile = static::projectRootPath() . '/composer.json';
+        return static::$container;
+    }
 
-        if (!file_exists($composerFile)) {
-            throw new \RuntimeException(
-                'Unable to locate the composer.json within the project.'
+    /**
+     * Determine if the project-x contain exist.
+     *
+     * @return bool
+     *   Return true if the container exist and is valid; otherwise false.
+     */
+    public static function hasContainer() : bool
+    {
+        return isset(static::$container)
+            && static::$container instanceof ContainerInterface;
+    }
+
+    /**
+     * Define the project user directory.
+     *
+     * @return string
+     *   The path to the user directory.
+     */
+    public static function userDir() : string
+    {
+        $userDirectory = (string) getenv('PX_USER_DIR');
+
+        return (string) is_dir($userDirectory)
+            ? $userDirectory
+            : getenv('HOME');
+    }
+
+    /**
+     * Define the project global temporary directory.
+     *
+     * @return string
+     *   The fully qualified path to the temporary directory.
+     */
+    public static function globalTempDir() : string
+    {
+        $userDirectory = static::userDir();
+        return "{$userDirectory}/.project-x";
+    }
+
+    /**
+     * Define the project temporary directory.
+     *
+     * @return string
+     *   The fully qualified path to the project temporary directory.
+     */
+    public static function projectTempDir() : string
+    {
+        return static::projectRootPath() . '/.project-x';
+    }
+
+    /**
+     * Define the project root path.
+     *
+     * @return string
+     *   The path to the project root.
+     */
+    public static function projectRootPath() : string
+    {
+        if (!isset(static::$projectRootPath)) {
+            static::$projectRootPath = static::findFileRootPath(
+                'composer.json'
             );
         }
 
-        static::$projectComposer = json_decode(
-            file_get_contents($composerFile), true
+        return static::$projectRootPath;
+    }
+
+    /**
+     * Get the project environment type.
+     *
+     * @return string
+     *   The current project environment type.
+     */
+    public static function getEnvironmentType() : string
+    {
+        $configuration = static::getConfiguration();
+
+        return $configuration->has('plugins.environment.type')
+            ? (string) $configuration->get('plugins.environment.type')
+            : 'localhost';
+    }
+
+    /**
+     * The project environment instance.
+     *
+     * @param array $config
+     *   An array of configurations to pass along to the instance.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
+     */
+    public static function getEnvironmentInstance(array $config = []) : EnvironmentTypeInterface
+    {
+        if (!isset(static::$projectEnvironment)) {
+            /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
+            $envManager = static::service('environmentTypePluginManager');
+
+            static::$projectEnvironment = $envManager->createInstance(
+                static::getEnvironmentType(), $config
+            );
+        }
+
+        return static::$projectEnvironment;
+    }
+
+    /**
+     * Get the project configuration instance.
+     *
+     * @return \Robo\Config\Config
+     *   The project configuration instance.
+     */
+    public static function getConfiguration()
+    {
+        return static::service('config');
+    }
+
+    /**
+     * Get the project composer definitions.
+     *
+     * @return array
+     *   An array of composer.json definitions.
+     */
+    public static function getProjectComposer() : array
+    {
+        return static::$projectComposer;
+    }
+
+    /**
+     * Check if a package is defined in the project composer.json.
+     *
+     * @param string $package
+     *   The composer package name.
+     *
+     * @return bool
+     *   Return true if composer package exist; otherwise false.
+     */
+    public static function composerHasPackage(string $package) : bool
+    {
+        return isset(static::getProjectComposer()['require'][$package]);
+    }
+
+    /**
+     * Execute the project-x console application.
+     *
+     * @return int
+     *   The project-x application status code.
+     */
+    public function execute() : int
+    {
+        $runner = (new Runner())
+            ->setContainer(static::getContainer())
+            ->setRelativePluginNamespace(static::PLUGIN_NAMESPACE);
+
+        return $runner->run(
+            static::service('input'),
+            static::service('output'),
+            $this,
+            static::projectCommandClasses()
         );
     }
 
@@ -420,20 +387,32 @@ class PxApp extends Application
     }
 
     /**
-     * Create project-x configuration.
+     * Get the project command classes that were discovered.
      *
-     * @return \Robo\Config\Config
-     *   The newly created project-x configuration instance.
+     * @return array
+     *   An array of discovered command classes.
      */
-    protected static function createConfiguration() : ConfigInterface
+    protected static function projectCommandClasses() : array
     {
-        $config = new \Robo\Config\Config();
-
-        Robo::loadConfiguration(
-            static::configPaths(), $config
+        return array_merge(
+            static::coreCommandClasses(),
+            static::pluginCommandClasses()
         );
+    }
 
-        return $config;
+    /**
+     * Define the project-x command classes.
+     *
+     * @return array
+     *   An array of core command classes.
+     */
+    protected static function coreCommandClasses() : array
+    {
+        return [
+            Core::class,
+            Config::class,
+            Artifact::class
+        ];
     }
 
     /**
@@ -487,9 +466,10 @@ class PxApp extends Application
      * Discover plugin instance registered command classes.
      *
      * @param \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin
+     *   The plugin instance.
      *
      * @return array
-     *   An array of registered command commands for the given plugin instance.
+     *   An array of registered command commands for the plugin instance.
      */
     protected static function discoverPluginCommandClasses(
         PluginInterface $plugin
@@ -530,6 +510,7 @@ class PxApp extends Application
      * Discover plugin manager registered command classes.
      *
      * @param \Pr0jectX\Px\PluginManagerInterface $plugin_manager
+     *   The plugin manager instance.
      *
      * @return array
      *   An array of registered command classes based on the plugin manager.
@@ -549,21 +530,18 @@ class PxApp extends Application
     }
 
     /**
-     * Find root path for a given file name.
+     * Find the file root path.
      *
-     * @param $filename
-     *   The file name.
-     * @param string $searchPath
-     *   The directory search path.
+     * @param string $filename
+     *   The search filename to base the path from.
      *
-     * @return boolean|string
-     *   The root path to the given file name.
+     * @return string
+     *   The file root path; otherwise fallback to the provided search path.
      */
-    protected static function findFileRootPath($filename, $searchPath = NULL)
+    protected static function findFileRootPath(string $filename) : string
     {
-        if (!isset($searchPath) || !file_exists($searchPath)) {
-            $searchPath = getcwd();
-        }
+        $searchPath = static::$projectSearchPath
+            ?? getcwd();
 
         if (file_exists("{$searchPath}/{$filename}")) {
             return $searchPath;
@@ -578,6 +556,6 @@ class PxApp extends Application
             }
         }
 
-        return false;
+        return $searchPath;
     }
 }
