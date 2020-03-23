@@ -14,5 +14,5 @@ interface PluginConfigurationBuilderInterface
     /**
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function pluginConfiguration() : ConfigTreeBuilder;
+    public function pluginConfiguration(): ConfigTreeBuilder;
 }

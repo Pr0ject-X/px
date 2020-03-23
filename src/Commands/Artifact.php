@@ -39,13 +39,15 @@ class Artifact extends CommandTasksBase
         'install-mirror' => [],
         'remove-submodules' => [],
         'search-submodules-depth' => 1
-    ]) {
+    ])
+    {
         $projectRoot = PxApp::projectRootPath();
         $buildRoot = "{$projectRoot}/{$opts['build-dir']}";
 
         if (file_exists($buildRoot)) {
             $cleanBuild = $this->confirm(
-                'Clean the build directory? [yes]', true
+                'Clean the build directory? [yes]',
+                true
             );
             if ($cleanBuild) {
                 $this->taskCleanDir($buildRoot)->run();
@@ -183,8 +185,7 @@ class Artifact extends CommandTasksBase
         $buildRoot,
         array $submoduleDirs = [],
         $submoduleSearchDepth = 1
-    )
-    {
+    ) {
         $this->removeSubmodulesInVendor($buildRoot);
 
         foreach ($submoduleDirs as $submoduleDir) {
@@ -194,7 +195,8 @@ class Artifact extends CommandTasksBase
                 continue;
             }
             $this->removeSubmodules(
-                [$searchDir], $submoduleSearchDepth
+                [$searchDir],
+                $submoduleSearchDepth
             );
         }
 
@@ -218,8 +220,7 @@ class Artifact extends CommandTasksBase
         array $options,
         $projectRoot,
         $buildRoot
-    )
-    {
+    ) {
         $this->moveComposerToBuild(
             $options,
             $buildRoot,
@@ -293,11 +294,13 @@ class Artifact extends CommandTasksBase
         array $options,
         $projectRoot,
         $buildRoot
-    )
-    {
+    ) {
         foreach (['project', 'build'] as $type) {
             $this->invokeFileSystemCommandProcess(
-                $type, $options, $buildRoot, $projectRoot
+                $type,
+                $options,
+                $buildRoot,
+                $projectRoot
             );
         }
 
@@ -321,13 +324,14 @@ class Artifact extends CommandTasksBase
         array $options,
         $buildRoot,
         $projectRoot
-    )
-    {
+    ) {
         $dirs = [$options['project-dir']];
 
         foreach (['copy', 'mirror'] as $method) {
             $sources = $this->extractSourcesFromOptions(
-                $options, $type, $method
+                $options,
+                $type,
+                $method
             );
             $this->moveSourceToDestination(
                 $method,
@@ -347,7 +351,8 @@ class Artifact extends CommandTasksBase
      * @return array
      *   An array of command configuration options.
      */
-    protected function getCommandConfigOptions($name) {
+    protected function getCommandConfigOptions($name)
+    {
         $configuration = PxApp::getConfiguration();
         $configCommandName = strtr($name, ':', '.');
 
@@ -366,7 +371,8 @@ class Artifact extends CommandTasksBase
     protected function removeSubmodulesInVendor($buildRoot)
     {
         $this->removeSubmodules(
-            ["{$buildRoot}/vendor"], 2
+            ["{$buildRoot}/vendor"],
+            2
         );
 
         return $this;
@@ -418,8 +424,10 @@ class Artifact extends CommandTasksBase
      */
     protected function extractSourcesFromOptions(array $options, $type, $method)
     {
-        if (!isset($options["{$type}-{$method}"])
-            || empty($options["{$type}-{$method}"])) {
+        if (
+            !isset($options["{$type}-{$method}"])
+            || empty($options["{$type}-{$method}"])
+        ) {
             return [];
         }
 
@@ -443,7 +451,8 @@ class Artifact extends CommandTasksBase
     {
         if ($type === 'project') {
             return implode(
-                '/', array_merge([$path], $directories)
+                '/',
+                array_merge([$path], $directories)
             );
         }
 
@@ -509,8 +518,10 @@ class Artifact extends CommandTasksBase
         $options['install-copy'] ?? [];
         $options['install-mirror'] ?? [];
 
-        if (file_exists("{$projectRoot}/patches")
-            && !in_array('patches', $options['install-mirror'])) {
+        if (
+            file_exists("{$projectRoot}/patches")
+            && !in_array('patches', $options['install-mirror'])
+        ) {
             $options['install-mirror'][] = 'patches';
         }
         $requiredComposerFiles = ['composer.json', 'composer.lock'];
@@ -522,7 +533,10 @@ class Artifact extends CommandTasksBase
         }
 
         $this->invokeFileSystemCommandProcess(
-            'install', $options, $buildRoot, $projectRoot
+            'install',
+            $options,
+            $buildRoot,
+            $projectRoot
         );
 
         $this->success(

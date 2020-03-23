@@ -28,16 +28,17 @@ class Config extends CommandTasksBase
 
         if (!isset($name)) {
             $name = $this->choice(
-                'Set plugin configuration for', $this->configOptions()
+                'Set plugin configuration for',
+                $this->configOptions()
             );
         }
 
         if ($config = $this->buildPluginConfiguration($name)) {
-           if ($this->savePluginConfiguration($config)) {
-               $this->success(
-                   sprintf('The %s plugin configuration has successfully been saved.', $name)
-               );
-           }
+            if ($this->savePluginConfiguration($config)) {
+                $this->success(
+                    sprintf('The %s plugin configuration has successfully been saved.', $name)
+                );
+            }
         }
     }
 
@@ -47,7 +48,7 @@ class Config extends CommandTasksBase
      * @return array
      *   An array of plugin configuration router details.
      */
-    protected function configPluginRouter() : array
+    protected function configPluginRouter(): array
     {
         $router = [
             'environment' => [
@@ -73,7 +74,7 @@ class Config extends CommandTasksBase
      * @return array
      *   An array of plugin configuration options.
      */
-    protected function configOptions() : array
+    protected function configOptions(): array
     {
         $options = [];
 
@@ -95,7 +96,7 @@ class Config extends CommandTasksBase
      *
      * @throws \Exception
      */
-    protected function buildPluginConfiguration($name) : array
+    protected function buildPluginConfiguration($name): array
     {
         $config = [];
 
@@ -123,7 +124,7 @@ class Config extends CommandTasksBase
      * @return bool
      *   Return true if the configurations were saved; otherwise false.
      */
-    protected function savePluginConfiguration(array $configurations) : bool
+    protected function savePluginConfiguration(array $configurations): bool
     {
         $projectRoot = PxApp::projectRootPath();
         $configFilename = PxApp::CONFIG_FILENAME;

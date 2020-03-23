@@ -18,7 +18,7 @@ trait CommonCommandTrait
      *
      * @return \Robo\Result
      */
-    protected function runSilentCommand(TaskInterface $task) : Result
+    protected function runSilentCommand(TaskInterface $task): Result
     {
         return $task->printOutput(false)
             // This is weird as you would expect this to give you more

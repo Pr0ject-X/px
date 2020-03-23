@@ -76,7 +76,7 @@ class PxApp extends Application
      * @return string
      *   The project-x application name.
      */
-    public static function displayBanner() : string
+    public static function displayBanner(): string
     {
         $filename = dirname(__DIR__) . '/banner.txt';
 
@@ -103,7 +103,7 @@ class PxApp extends Application
      * @param string $searchPath
      *   The project search path to determine the root.
      */
-    public static function setProjectSearchPath(string $searchPath) : void
+    public static function setProjectSearchPath(string $searchPath): void
     {
         static::$projectSearchPath = getcwd();
 
@@ -117,7 +117,7 @@ class PxApp extends Application
      *
      * @throws \RuntimeException
      */
-    public static function loadProjectComposer() : void
+    public static function loadProjectComposer(): void
     {
         $composerFile = static::projectRootPath() . '/composer.json';
 
@@ -128,7 +128,8 @@ class PxApp extends Application
         }
 
         static::$projectComposer = json_decode(
-            file_get_contents($composerFile), true
+            file_get_contents($composerFile),
+            true
         );
     }
 
@@ -166,8 +167,7 @@ class PxApp extends Application
         OutputInterface $output = null,
         Application $app,
         $classLoader
-    )
-    {
+    ) {
         if (!static::hasContainer()) {
             $container = new Container();
 
@@ -204,7 +204,7 @@ class PxApp extends Application
      * @return \League\Container\ContainerInterface
      *   The project-x service container.
      */
-    public static function getContainer() : ContainerInterface
+    public static function getContainer(): ContainerInterface
     {
         return static::$container;
     }
@@ -215,7 +215,7 @@ class PxApp extends Application
      * @return bool
      *   Return true if the container exist and is valid; otherwise false.
      */
-    public static function hasContainer() : bool
+    public static function hasContainer(): bool
     {
         return isset(static::$container)
             && static::$container instanceof ContainerInterface;
@@ -227,7 +227,7 @@ class PxApp extends Application
      * @return string
      *   The path to the user directory.
      */
-    public static function userDir() : string
+    public static function userDir(): string
     {
         $userDirectory = (string) getenv('PX_USER_DIR');
 
@@ -242,7 +242,7 @@ class PxApp extends Application
      * @return string
      *   The fully qualified path to the temporary directory.
      */
-    public static function globalTempDir() : string
+    public static function globalTempDir(): string
     {
         $userDirectory = static::userDir();
         return "{$userDirectory}/.project-x";
@@ -254,7 +254,7 @@ class PxApp extends Application
      * @return string
      *   The fully qualified path to the project temporary directory.
      */
-    public static function projectTempDir() : string
+    public static function projectTempDir(): string
     {
         return static::projectRootPath() . '/.project-x';
     }
@@ -265,7 +265,7 @@ class PxApp extends Application
      * @return string
      *   The path to the project root.
      */
-    public static function projectRootPath() : string
+    public static function projectRootPath(): string
     {
         if (!isset(static::$projectRootPath)) {
             static::$projectRootPath = static::findFileRootPath(
@@ -282,7 +282,7 @@ class PxApp extends Application
      * @return string
      *   The current project environment type.
      */
-    public static function getEnvironmentType() : string
+    public static function getEnvironmentType(): string
     {
         $configuration = static::getConfiguration();
 
@@ -299,14 +299,15 @@ class PxApp extends Application
      *
      * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
      */
-    public static function getEnvironmentInstance(array $config = []) : EnvironmentTypeInterface
+    public static function getEnvironmentInstance(array $config = []): EnvironmentTypeInterface
     {
         if (!isset(static::$projectEnvironment)) {
             /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
             $envManager = static::service('environmentTypePluginManager');
 
             static::$projectEnvironment = $envManager->createInstance(
-                static::getEnvironmentType(), $config
+                static::getEnvironmentType(),
+                $config
             );
         }
 
@@ -330,7 +331,7 @@ class PxApp extends Application
      * @return array
      *   An array of composer.json definitions.
      */
-    public static function getProjectComposer() : array
+    public static function getProjectComposer(): array
     {
         return static::$projectComposer;
     }
@@ -344,7 +345,7 @@ class PxApp extends Application
      * @return bool
      *   Return true if composer package exist; otherwise false.
      */
-    public static function composerHasPackage(string $package) : bool
+    public static function composerHasPackage(string $package): bool
     {
         return isset(static::getProjectComposer()['require'][$package]);
     }
@@ -355,7 +356,7 @@ class PxApp extends Application
      * @return int
      *   The project-x application status code.
      */
-    public function execute() : int
+    public function execute(): int
     {
         $runner = (new Runner())
             ->setContainer(static::getContainer())
@@ -375,7 +376,7 @@ class PxApp extends Application
      * @return array
      *   An array of configuration paths.
      */
-    protected static function configPaths() : array
+    protected static function configPaths(): array
     {
         $filename = static::CONFIG_FILENAME;
         $rootPath = static::projectRootPath();
@@ -392,7 +393,7 @@ class PxApp extends Application
      * @return array
      *   An array of discovered command classes.
      */
-    protected static function projectCommandClasses() : array
+    protected static function projectCommandClasses(): array
     {
         return array_merge(
             static::coreCommandClasses(),
@@ -406,7 +407,7 @@ class PxApp extends Application
      * @return array
      *   An array of core command classes.
      */
-    protected static function coreCommandClasses() : array
+    protected static function coreCommandClasses(): array
     {
         return [
             Core::class,
@@ -421,7 +422,7 @@ class PxApp extends Application
      * @return array
      *   An array of plugin command classes.
      */
-    protected static function pluginCommandClasses() : array
+    protected static function pluginCommandClasses(): array
     {
         $classes = [];
 
@@ -454,7 +455,7 @@ class PxApp extends Application
     protected static function pluginCommandFactory(
         PluginInterface $plugin,
         string $classname
-    ) : CommandTasksBase {
+    ): CommandTasksBase {
         if (is_subclass_of($classname, PluginCommandTaskBase::class)) {
             return new $classname($plugin);
         }
@@ -473,13 +474,15 @@ class PxApp extends Application
      */
     protected static function discoverPluginCommandClasses(
         PluginInterface $plugin
-    ) : array {
+    ): array {
         $classes = [];
 
         if ($plugin instanceof PluginCommandRegisterInterface) {
             foreach ($plugin->registeredCommands() as $command) {
-                if (!class_exists($command)
-                    || !is_subclass_of($command, CommandTasksBase::class)) {
+                if (
+                    !class_exists($command)
+                    || !is_subclass_of($command, CommandTasksBase::class)
+                ) {
                     continue;
                 }
                 $instance = static::pluginCommandFactory($plugin, $command);
@@ -517,7 +520,7 @@ class PxApp extends Application
      */
     protected static function discoverPluginManagerCommands(
         PluginManagerInterface $plugin_manager
-    ) : array {
+    ): array {
         $commands = [];
         $interface = PluginCommandRegisterInterface::class;
         $configurations = PxApp::getConfiguration()->get('plugins') ?? [];
@@ -538,7 +541,7 @@ class PxApp extends Application
      * @return string
      *   The file root path; otherwise fallback to the provided search path.
      */
-    protected static function findFileRootPath(string $filename) : string
+    protected static function findFileRootPath(string $filename): string
     {
         $searchPath = static::$projectSearchPath
             ?? getcwd();

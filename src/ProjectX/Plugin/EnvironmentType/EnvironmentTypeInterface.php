@@ -91,7 +91,7 @@ interface EnvironmentTypeInterface extends PluginInterface, PluginConfigurationB
      * @return string
      *   The path to the environment application root.
      */
-    public function envAppRoot() : string;
+    public function envAppRoot(): string;
 
     /**
      * Define the environment packages.

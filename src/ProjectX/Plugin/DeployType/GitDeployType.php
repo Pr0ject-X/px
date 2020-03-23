@@ -19,7 +19,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function pluginId() : string
+    public static function pluginId(): string
     {
         return 'git';
     }
@@ -27,7 +27,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function pluginLabel() : string
+    public static function pluginLabel(): string
     {
         return 'Git';
     }
@@ -35,7 +35,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public static function deployOptions() : array
+    public static function deployOptions(): array
     {
         return [
             new InputOption(
@@ -64,13 +64,14 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getRepo() : string
+    public function getRepo(): string
     {
         $options = $this->getOptions();
 
         if (!isset($options['repo'])) {
             throw new DeployTypeOptionRequired(
-                static::pluginId(), 'repo'
+                static::pluginId(),
+                'repo'
             );
         }
 
@@ -80,13 +81,14 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getOrigin() : string
+    public function getOrigin(): string
     {
         $options = $this->getOptions();
 
         if (!isset($options['origin'])) {
             throw new DeployTypeOptionRequired(
-                static::pluginId(), 'origin'
+                static::pluginId(),
+                'origin'
             );
         }
 
@@ -96,7 +98,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     /**
      * {@inheritDoc}
      */
-    public function getBranch() : string
+    public function getBranch(): string
     {
         return $this->getOptions()['branch'];
     }
@@ -107,7 +109,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The build version method (e.g. tag or file).
      */
-    public function getBuildVersioningMethod() : string
+    public function getBuildVersioningMethod(): string
     {
         return $this->getOptions()['versioning-method'] ?? 'tag';
     }
@@ -118,7 +120,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the build version shouldn't be applied; otherwise false.
      */
-    public function noBuildVersion() : bool
+    public function noBuildVersion(): bool
     {
         return $this->getOptions()['no-build-version'] ?? false;
     }
@@ -202,7 +204,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the build directory has GIT support; otherwise false.
      */
-    protected function buildDirectoryHasGit() : bool
+    protected function buildDirectoryHasGit(): bool
     {
         return file_exists("{$this->getBuildDir()}/.git");
     }
@@ -213,7 +215,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The latest build version based on the versioning method.
      */
-    protected function latestBuildVersion() : string
+    protected function latestBuildVersion(): string
     {
         switch ($this->getBuildVersioningMethod()) {
             case 'file':
@@ -225,8 +227,10 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
                 break;
         }
 
-        if ($version === false
-            || !preg_match('/(\d+.\d+.\d+)/', $version)) {
+        if (
+            $version === false
+            || !preg_match('/(\d+.\d+.\d+)/', $version)
+        ) {
             $version = '0.0.0';
         }
 
@@ -283,10 +287,11 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if contents has been updated; otherwise false.
      */
-    protected function updateBuildVersionFile($buildVersion) : bool
+    protected function updateBuildVersionFile($buildVersion): bool
     {
         $status = file_put_contents(
-            $this->getBuildVersionFile(), $buildVersion
+            $this->getBuildVersionFile(),
+            $buildVersion
         );
 
         return $status !== false;
@@ -298,7 +303,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if git tracked files changed; otherwise false.
      */
-    protected function hasTrackedFilesChanged() : bool
+    protected function hasTrackedFilesChanged(): bool
     {
         $task = $this->getGitBuildStack()
             ->exec("status --untracked-files=no --porcelain");
@@ -319,7 +324,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return bool
      *   Return true if the remote branch exist; otherwise false.
      */
-    protected function remoteBranchExist() : bool
+    protected function remoteBranchExist(): bool
     {
         $task = $this->getGitBuildStack()
             ->exec("ls-remote --exit-code --heads {$this->getRepo()} {$this->getBranch()}");
@@ -336,7 +341,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return string
      *   The path to the version file in the build directory.
      */
-    protected function getBuildVersionFile() : string
+    protected function getBuildVersionFile(): string
     {
         return "{$this->getBuildDir()}/VERSION";
     }
@@ -347,7 +352,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
      * @return \Robo\Collection\CollectionBuilder
      *   Get the GIT build stack instance.
      */
-    protected function getGitBuildStack() : CollectionBuilder
+    protected function getGitBuildStack(): CollectionBuilder
     {
         return $this->taskGitStack()->dir($this->getBuildDir());
     }

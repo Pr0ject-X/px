@@ -47,7 +47,7 @@ class ConfigNode
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode
      */
-    public function setValue($value) : ConfigNode
+    public function setValue($value): ConfigNode
     {
         $this->nodeValue[] = $value;
 
@@ -59,7 +59,7 @@ class ConfigNode
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNodeArray
      */
-    public function setArray() : ConfigNodeArray
+    public function setArray(): ConfigNodeArray
     {
         $array = new ConfigNodeArray($this);
 
@@ -75,7 +75,7 @@ class ConfigNode
      *
      * @return array
      */
-    public function getCondition() : array
+    public function getCondition(): array
     {
         return $this->nodeConditions;
     }
@@ -85,7 +85,7 @@ class ConfigNode
      *
      * @return bool
      */
-    public function hasCondition() : bool
+    public function hasCondition(): bool
     {
         return isset($this->nodeConditions) && !empty($this->nodeConditions);
     }
@@ -97,7 +97,7 @@ class ConfigNode
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode
      */
-    public function setCondition(callable $condition) : ConfigNode
+    public function setCondition(callable $condition): ConfigNode
     {
         $this->nodeConditions[] = $condition;
 
@@ -110,7 +110,7 @@ class ConfigNode
      * @return array
      *   An array of node values.
      */
-    public function getValue() : array
+    public function getValue(): array
     {
         return $this->nodeValue;
     }
@@ -120,7 +120,7 @@ class ConfigNode
      *
      * @return bool
      */
-    public function hasNodeArrayValue() : bool
+    public function hasNodeArrayValue(): bool
     {
         return $this->nodeValueHasArray;
     }
@@ -131,7 +131,7 @@ class ConfigNode
      * @return bool
      *   Return true if has multiple values; otherwise false.
      */
-    public function hasMultipleValues() : bool
+    public function hasMultipleValues(): bool
     {
         return count($this->nodeValue) > 1;
     }
@@ -141,7 +141,7 @@ class ConfigNode
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function end() : ConfigTreeBuilder
+    public function end(): ConfigTreeBuilder
     {
         return $this->tree;
     }

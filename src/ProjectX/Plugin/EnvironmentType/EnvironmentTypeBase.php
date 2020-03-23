@@ -90,7 +90,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function envPackages() : array
+    public function envPackages(): array
     {
         return [];
     }
@@ -98,7 +98,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function registeredCommands() : array
+    public function registeredCommands(): array
     {
         return [
             Environment::class
@@ -118,9 +118,10 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
             ->setQuestionOutput($this->output)
             ->createNode('type')
                 ->setValue($this->choice(
-                    'Select the environment type', $envOptions, $envType !== 'localhost' ? $envType : ''
+                    'Select the environment type',
+                    $envOptions,
+                    $envType !== 'localhost' ? $envType : ''
                 ))
             ->end();
     }
-
 }

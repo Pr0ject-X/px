@@ -20,7 +20,7 @@ abstract class DeployTypeBase extends PluginTasksBase implements DeployTypeInter
      * @return array
      *   An array of deploy type options.
      */
-    public function getOptions() : array
+    public function getOptions(): array
     {
         return $this->input()->getOptions();
     }
@@ -31,7 +31,7 @@ abstract class DeployTypeBase extends PluginTasksBase implements DeployTypeInter
      * @return string
      *   The artifact build directory.
      */
-    public function getBuildDir() : string
+    public function getBuildDir(): string
     {
         return $this->getOptions()['build-dir'];
     }
@@ -45,7 +45,7 @@ abstract class DeployTypeBase extends PluginTasksBase implements DeployTypeInter
      * @return string
      *   The next build semantic version.
      */
-    protected function buildSemanticVersion($lastVersion) : string
+    protected function buildSemanticVersion($lastVersion): string
     {
         $nextVersion = $this->incrementSemanticVersion($lastVersion);
 
@@ -88,7 +88,7 @@ abstract class DeployTypeBase extends PluginTasksBase implements DeployTypeInter
         $version,
         $patchLimit = 20,
         $minorLimit = 50
-    ) : string {
+    ): string {
         if (!$this->isVersionNumeric($version)) {
             throw new \RuntimeException(
                 'Unable to increment semantic version.'
@@ -119,7 +119,7 @@ abstract class DeployTypeBase extends PluginTasksBase implements DeployTypeInter
      * @return bool
      *   Return true if the version is numeric; otherwise false.
      */
-    protected function isVersionNumeric($version) : bool
+    protected function isVersionNumeric($version): bool
     {
         foreach (explode('.', $version) as $part) {
             if (!is_numeric($part)) {

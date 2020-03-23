@@ -12,12 +12,12 @@ use Symfony\Component\Console\Question\Question;
  */
 class Core extends CommandTasksBase
 {
+    use CommonCommandTrait;
+
     /**
      * @var string
      */
     const DEFAULT_PROJECT_FILE = 'projects.json';
-
-    use CommonCommandTrait;
 
     /**
      * Save the project location.
@@ -39,7 +39,8 @@ class Core extends CommandTasksBase
                 'path' => $path
             ];
             $data = array_replace(
-                $this->loadGlobalProjectData(), $project
+                $this->loadGlobalProjectData(),
+                $project
             );
 
             if ($status = $this->saveGlobalProject($data)) {
@@ -129,7 +130,7 @@ class Core extends CommandTasksBase
     /**
      * Add the CLI integration into your shell (e.g .bashrc, .zshrc).
      */
-    public function coreCliShortcut ()
+    public function coreCliShortcut()
     {
         $userShellRcFile = $this->getUserShellRcFile();
 
@@ -140,7 +141,8 @@ class Core extends CommandTasksBase
         }
 
         $continue = $this->confirm(
-            sprintf('Add the CLI integration to %s?', $userShellRcFile), true
+            sprintf('Add the CLI integration to %s?', $userShellRcFile),
+            true
         );
 
         if ($continue) {
@@ -156,11 +158,13 @@ class Core extends CommandTasksBase
 
             if ($shortcutResult->wasSuccessful() || $switchResult->wasSuccessful()) {
                 $this->success(sprintf(
-                    'Successfully added the CLI integration to %s.', $userShellRcFile
+                    'Successfully added the CLI integration to %s.',
+                    $userShellRcFile
                 ));
 
                 $this->note(sprintf(
-                    'Run `source %s` to finalize the process.', $userShellRcFile
+                    'Run `source %s` to finalize the process.',
+                    $userShellRcFile
                 ));
             }
         }
@@ -172,9 +176,9 @@ class Core extends CommandTasksBase
      * @return string|null
      *   The host environment user home.
      */
-    protected function getUserHome() : string
+    protected function getUserHome(): string
     {
-        return getenv('HOME') ?: NULL;
+        return getenv('HOME') ?: null;
     }
 
     /**
@@ -183,12 +187,13 @@ class Core extends CommandTasksBase
      * @return string|null
      *   The host environment user shell.
      */
-    protected function getUserShell() : string
+    protected function getUserShell(): string
     {
         $shell = getenv('SHELL');
 
         return substr(
-            $shell, strrpos($shell, '/') + 1
+            $shell,
+            strrpos($shell, '/') + 1
         ) ?: '';
     }
 
@@ -198,7 +203,7 @@ class Core extends CommandTasksBase
      * @return string
      *   The host environment user shell RC filepath.
      */
-    protected function getUserShellRcFile() : string
+    protected function getUserShellRcFile(): string
     {
         return "{$this->getUserHome()}/.{$this->getUserShell()}rc";
     }
@@ -209,7 +214,7 @@ class Core extends CommandTasksBase
      * @return string
      *   The CLI shortcut function contents.
      */
-    protected function getShortcutContents() : string
+    protected function getShortcutContents(): string
     {
         return file_get_contents(APPLICATION_ROOT . '/templates/core/shortcut.txt');
     }
@@ -220,7 +225,7 @@ class Core extends CommandTasksBase
      * @return string
      *   The CLI switch function contents.
      */
-    protected function getSwitcherContents() : string
+    protected function getSwitcherContents(): string
     {
         return file_get_contents(APPLICATION_ROOT . '/templates/core/switcher.txt');
     }
@@ -244,7 +249,8 @@ class Core extends CommandTasksBase
                 }
 
                 return $value;
-            }));
+            })
+        );
     }
 
     /**
@@ -253,7 +259,7 @@ class Core extends CommandTasksBase
      * @return array
      *   An array of project options.
      */
-    protected function globalProjectOptions() : array
+    protected function globalProjectOptions(): array
     {
         $options = [];
 
@@ -276,7 +282,7 @@ class Core extends CommandTasksBase
      * @return bool
      *   Return true if successfully; otherwise false.
      */
-    protected function saveGlobalProject(array $data) : bool
+    protected function saveGlobalProject(array $data): bool
     {
         $results = $this
             ->taskWriteToFile($this->globalProjectFilename())
@@ -292,7 +298,7 @@ class Core extends CommandTasksBase
      * @return string
      *   The global project filename.
      */
-    protected function globalProjectFilename() : string
+    protected function globalProjectFilename(): string
     {
         $globalTempDir = PxApp::globalTempDir();
         $projectFile = static::DEFAULT_PROJECT_FILE;
@@ -306,7 +312,7 @@ class Core extends CommandTasksBase
      * @return bool
      *   Return true if the project; otherwise false.
      */
-    protected function globalProjectExist() : bool
+    protected function globalProjectExist(): bool
     {
         return isset($this->loadGlobalProjectData()[PxApp::projectRootPath()]);
     }
@@ -317,7 +323,7 @@ class Core extends CommandTasksBase
      * @return array
      *   An array of the global projects.
      */
-    protected function loadGlobalProjectData() : array
+    protected function loadGlobalProjectData(): array
     {
         $projects = [];
         $projectFilename = $this->globalProjectFilename();

@@ -15,5 +15,5 @@ interface PluginCommandRegisterInterface
      * @return array
      *   An array of plugin commands.
      */
-    public function registeredCommands() : array;
+    public function registeredCommands(): array;
 }

@@ -20,7 +20,7 @@ class MySql extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\MySql
      */
-    public function database(string $database) : MySql
+    public function database(string $database): MySql
     {
         $this->setArgument($database);
 
@@ -34,7 +34,7 @@ class MySql extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\MySql
      */
-    public function host(string $host) : MySql
+    public function host(string $host): MySql
     {
         $this->setOption(__FUNCTION__, $host);
 
@@ -48,7 +48,7 @@ class MySql extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\MySql
      */
-    public function user(string $user) : MySql
+    public function user(string $user): MySql
     {
         $this->setOption(__FUNCTION__, $user);
 
@@ -62,7 +62,7 @@ class MySql extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\MySql
      */
-    public function password(string $password) : MySql
+    public function password(string $password): MySql
     {
         $this->setOption(__FUNCTION__, $password);
 

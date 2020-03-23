@@ -22,7 +22,7 @@ class LocalhostEnvironmentType extends EnvironmentTypeBase
     /**
      * @inheritDoc
      */
-    public static function pluginId() : string
+    public static function pluginId(): string
     {
         return 'localhost';
     }
@@ -30,7 +30,7 @@ class LocalhostEnvironmentType extends EnvironmentTypeBase
     /**
      * @inheritDoc
      */
-    public static function pluginLabel() : string
+    public static function pluginLabel(): string
     {
         return 'Localhost';
     }

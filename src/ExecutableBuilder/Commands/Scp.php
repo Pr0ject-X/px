@@ -33,7 +33,7 @@ class Scp extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
      */
-    public function source($path) : Scp
+    public function source($path): Scp
     {
         $this->source = $path;
 
@@ -48,7 +48,7 @@ class Scp extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
      */
-    public function target($path) : Scp
+    public function target($path): Scp
     {
         $this->target = $path;
 
@@ -63,7 +63,7 @@ class Scp extends ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
      */
-    public function identityFile(string $identify_file) : Scp
+    public function identityFile(string $identify_file): Scp
     {
         if (!file_exists($identify_file)) {
             throw new \RuntimeException(
@@ -78,7 +78,7 @@ class Scp extends ExecutableBuilderBase
     /**
      * {@inheritDoc}
      */
-    public function build() : string
+    public function build(): string
     {
         $executable = static::EXECUTABLE;
         return "{$executable} {$this->flattenOptions()} {$this->source}  {$this->target}";

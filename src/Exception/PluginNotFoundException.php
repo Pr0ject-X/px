@@ -16,10 +16,11 @@ class PluginNotFoundException extends \Exception
      *   The exception exit code.
      * @param null $previous
      */
-    public function __construct($id, $code = 0, $previous = NULL)
+    public function __construct($id, $code = 0, $previous = null)
     {
         $message = sprintf(
-            "The %s plugin id was not found.", $id
+            "The %s plugin id was not found.",
+            $id
         );
         parent::__construct($message, $code, $previous);
     }

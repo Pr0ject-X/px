@@ -12,7 +12,8 @@ use Symfony\Component\Console\Question\Question;
 /**
  * Define configuration tree builder.
  */
-class ConfigTreeBuilder {
+class ConfigTreeBuilder
+{
 
     /**
      * @var array
@@ -41,7 +42,7 @@ class ConfigTreeBuilder {
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function setQuestionInput(Input $input) : ConfigTreeBuilder
+    public function setQuestionInput(Input $input): ConfigTreeBuilder
     {
         $this->input = $input;
 
@@ -54,7 +55,7 @@ class ConfigTreeBuilder {
      * @param \Symfony\Component\Console\Output\Output $output
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function setQuestionOutput(Output $output) : ConfigTreeBuilder
+    public function setQuestionOutput(Output $output): ConfigTreeBuilder
     {
         $this->output = $output;
 
@@ -66,7 +67,7 @@ class ConfigTreeBuilder {
      *
      * @return ConfigTreeBuilder
      */
-    public function isImmutable() : ConfigTreeBuilder
+    public function isImmutable(): ConfigTreeBuilder
     {
         $this->immutable = true;
 
@@ -83,7 +84,7 @@ class ConfigTreeBuilder {
      *
      * @throws \Exception
      */
-    public function createNode(string $name) : ConfigNode
+    public function createNode(string $name): ConfigNode
     {
         if (!isset($this->tree[$name])) {
             $this->tree[$name] = new ConfigNode($this);
@@ -101,7 +102,7 @@ class ConfigTreeBuilder {
      *
      * @return array
      */
-    public function build() : array
+    public function build(): array
     {
         $build = [];
 
@@ -167,7 +168,7 @@ class ConfigTreeBuilder {
         ConfigNode $node,
         array $args = [],
         bool $mustPassAll = false
-    ) : bool {
+    ): bool {
         if (!$node->hasCondition()) {
             return true;
         }

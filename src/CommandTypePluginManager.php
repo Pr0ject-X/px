@@ -14,7 +14,7 @@ class CommandTypePluginManager extends DefaultPluginManager
     /**
      * @inheritDoc
      */
-    public function discover(ClassDiscoveryInterface $classDiscovery) : array
+    public function discover(ClassDiscoveryInterface $classDiscovery): array
     {
         if (empty($this->pluginClasses)) {
             $this->pluginClasses = $classDiscovery

@@ -84,7 +84,7 @@ trait IOExtraTrait
      * @return string
      *   The selected choice response.
      */
-    protected function choice(string $question, array $choices, string $default = null) : string
+    protected function choice(string $question, array $choices, string $default = null): string
     {
         return $this->doAsk(
             new ChoiceQuestion($this->formatQuestionDefault($question, $default), $choices, $default)
@@ -102,7 +102,7 @@ trait IOExtraTrait
      * @return string
      *   The formatted question with default value.
      */
-    protected function formatQuestionDefault(string $question, $default = null) : string
+    protected function formatQuestionDefault(string $question, $default = null): string
     {
         $formattedQuestion = $question;
 

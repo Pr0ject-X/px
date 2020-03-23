@@ -33,7 +33,7 @@ abstract class ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setArgument(string $argument) : ExecutableBuilderBase
+    public function setArgument(string $argument): ExecutableBuilderBase
     {
         $this->arguments[] = $argument;
 
@@ -48,7 +48,7 @@ abstract class ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setArguments(array $arguments) : ExecutableBuilderBase
+    public function setArguments(array $arguments): ExecutableBuilderBase
     {
         foreach ($arguments as $argument) {
             $this->setArgument($argument);
@@ -67,7 +67,7 @@ abstract class ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setOption(string $parameter, string $value) : ExecutableBuilderBase
+    public function setOption(string $parameter, string $value): ExecutableBuilderBase
     {
         $this->options[$parameter] = $value;
 
@@ -82,7 +82,7 @@ abstract class ExecutableBuilderBase
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setOptions(array $options) : ExecutableBuilderBase
+    public function setOptions(array $options): ExecutableBuilderBase
     {
         foreach ($options as $parameter => $value) {
             $this->setOption($parameter, $value);
@@ -96,7 +96,7 @@ abstract class ExecutableBuilderBase
      *
      * @return array
      */
-    protected function buildOptions() : array
+    protected function buildOptions(): array
     {
         $options = [];
         $delimiter = static::OPTION_DELIMITER;
@@ -117,7 +117,7 @@ abstract class ExecutableBuilderBase
      *
      * @return string
      */
-    protected function flattenArguments() : string
+    protected function flattenArguments(): string
     {
         return trim(implode(' ', $this->arguments));
     }
@@ -127,7 +127,7 @@ abstract class ExecutableBuilderBase
      *
      * @return string
      */
-    protected function flattenOptions() : string
+    protected function flattenOptions(): string
     {
         return trim(implode(' ', $this->buildOptions()));
     }
@@ -137,7 +137,7 @@ abstract class ExecutableBuilderBase
      *
      * @return array
      */
-    protected function executableStructure() : array
+    protected function executableStructure(): array
     {
         return [
             static::EXECUTABLE,
@@ -152,7 +152,7 @@ abstract class ExecutableBuilderBase
      * @return string
      *   An fully executable command to run within a local or remote environment.
      */
-    public function build() : string
+    public function build(): string
     {
         return trim(implode(' ', $this->executableStructure()));
     }

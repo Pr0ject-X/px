@@ -122,7 +122,7 @@ class Environment extends CommandTasksBase
      * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
      *   The environment plugin instance.
      */
-    protected function createInstance(array $config = []) : PluginInterface
+    protected function createInstance(array $config = []): PluginInterface
     {
         return Pxapp::getEnvironmentInstance($config);
     }

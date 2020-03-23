@@ -38,8 +38,7 @@ abstract class PluginTasksBase extends Tasks implements PluginInterface
     public function __construct(
         PluginManagerInterface $plugin_manager,
         array $configurations
-    )
-    {
+    ) {
         $this->pluginManager = $plugin_manager;
         $this->configurations = $configurations;
     }
@@ -47,7 +46,7 @@ abstract class PluginTasksBase extends Tasks implements PluginInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigurations() : array
+    public function getConfigurations(): array
     {
         return $this->configurations;
     }

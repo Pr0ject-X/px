@@ -37,7 +37,7 @@ class ConfigNodeArray
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNodeArray
      */
-    public function setIndexValue($value) : ConfigNodeArray
+    public function setIndexValue($value): ConfigNodeArray
     {
         $this->arrayValue[] = $value;
 
@@ -54,7 +54,7 @@ class ConfigNodeArray
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNodeArray
      */
-    public function setKeyValue(string $key, $value) : ConfigNodeArray
+    public function setKeyValue(string $key, $value): ConfigNodeArray
     {
         $this->arrayValue[$key] = $value;
 
@@ -66,7 +66,7 @@ class ConfigNodeArray
      *
      * @return array
      */
-    public function getValue() : array
+    public function getValue(): array
     {
         return $this->arrayValue;
     }
@@ -76,7 +76,7 @@ class ConfigNodeArray
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode
      */
-    public function end() : ConfigNode
+    public function end(): ConfigNode
     {
         return $this->configNode;
     }

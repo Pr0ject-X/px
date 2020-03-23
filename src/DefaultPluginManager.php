@@ -53,8 +53,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
         Input $input,
         Output $output,
         ClassDiscoveryInterface $class_discovery
-    )
-    {
+    ) {
         $this->input = $input;
         $this->output = $output;
         $this->discover($class_discovery);
@@ -63,7 +62,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function getClassname(string $plugin_id) : string
+    public function getClassname(string $plugin_id): string
     {
         return $this->findPluginById(
             $plugin_id,
@@ -74,7 +73,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function getOptions(array $exclude_ids = []) : array
+    public function getOptions(array $exclude_ids = []): array
     {
         $options = [];
 
@@ -82,8 +81,10 @@ abstract class DefaultPluginManager implements PluginManagerInterface
         foreach ($this->pluginClasses as $className) {
             $pluginId = $className::pluginId();
 
-            if (in_array($pluginId, $exclude_ids)
-                || !is_subclass_of($className, PluginInterface::class)) {
+            if (
+                in_array($pluginId, $exclude_ids)
+                || !is_subclass_of($className, PluginInterface::class)
+            ) {
                 continue;
             }
             $options[$pluginId] = $className::pluginLabel();
@@ -98,13 +99,14 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     public function createInstance(
         string $plugin_id,
         array $configurations = []
-    ) : PluginInterface {
+    ): PluginInterface {
         $pluginArgHash = serialize($configurations);
         $pluginCacheId = sha1("{$plugin_id}:{$pluginArgHash}");
 
         if (!isset(static::$pluginInstances[$pluginCacheId])) {
             static::$pluginInstances[$pluginCacheId] = $this->instantiatePluginInstance(
-                $plugin_id, $configurations
+                $plugin_id,
+                $configurations
             );
         }
 
@@ -125,7 +127,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     public function loadInstancesWithInterface(
         string $interface,
         array $configurations = []
-    ) : array {
+    ): array {
         $instances = [];
 
         foreach ($this->pluginClasses as $classname) {
@@ -136,7 +138,8 @@ abstract class DefaultPluginManager implements PluginManagerInterface
             $pluginConfig = $configurations[$pluginId] ?? [];
 
             $instances[$pluginId] = $this->createInstance(
-                $pluginId, $pluginConfig
+                $pluginId,
+                $pluginConfig
             );
         }
 
@@ -158,7 +161,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     protected function instantiatePluginInstance(
         string $plugin_id,
         array $configurations
-    ) : PluginInterface {
+    ): PluginInterface {
         if ($classname = $this->getClassname($plugin_id)) {
 
             /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $instance */
@@ -203,7 +206,8 @@ abstract class DefaultPluginManager implements PluginManagerInterface
 
         /** @var \Pr0jectX\Px\PluginInterface $class_name */
         foreach ($plugins as $class_name) {
-            if (!class_exists($class_name)
+            if (
+                !class_exists($class_name)
                 || !is_subclass_of($class_name, $interface)
                 || $class_name::pluginId() !== $plugin_id
             ) {

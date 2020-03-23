@@ -47,7 +47,7 @@ abstract class CommandTasksBase extends Tasks
      * @return bool
      *   Return true if the directory is empty; otherwise false.
      */
-    protected function isDirEmpty($directory) : bool
+    protected function isDirEmpty($directory): bool
     {
         return !file_exists($directory)
             || !(new \FilesystemIterator($directory))->valid();

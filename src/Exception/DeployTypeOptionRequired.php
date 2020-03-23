@@ -18,7 +18,7 @@ class DeployTypeOptionRequired extends \RuntimeException
      *   The exception code.
      * @param null $previous
      */
-    public function __construct($type, $option, $code = 0, $previous = NULL)
+    public function __construct($type, $option, $code = 0, $previous = null)
     {
         $message = sprintf("The %s %s option is required!", $type, $option);
 
