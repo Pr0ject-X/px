@@ -32,7 +32,12 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     /**
      * @var array
      */
-    protected $pluginClasses = [];
+    protected $plugins = [];
+
+    /**
+     * @var \Robo\ClassDiscovery\ClassDiscoveryInterface
+     */
+    protected $classDiscovery;
 
     /**
      * @var array
@@ -56,38 +61,31 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     ) {
         $this->input = $input;
         $this->output = $output;
-        $this->discover($class_discovery);
+        $this->classDiscovery = $class_discovery;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getClassname(string $plugin_id): string
+    public function getClassname(string $pluginId): string
     {
-        return $this->findPluginById(
-            $plugin_id,
-            $this->pluginClasses
-        );
+        if (empty($this->plugins)) {
+            $this->getPlugins();
+        }
+
+        return $this->plugins[$pluginId] ?? "";
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getOptions(array $exclude_ids = []): array
+    public function getOptions(array $excludeIds = []): array
     {
         $options = [];
 
-        /** @var PluginInterface $className */
-        foreach ($this->pluginClasses as $className) {
-            $pluginId = $className::pluginId();
-
-            if (
-                in_array($pluginId, $exclude_ids)
-                || !is_subclass_of($className, PluginInterface::class)
-            ) {
-                continue;
-            }
-            $options[$pluginId] = $className::pluginLabel();
+        /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin */
+        foreach ($this->getPlugins() as $pluginId => $pluginClass) {
+            $options[$pluginId] = $pluginClass::pluginLabel();
         }
 
         return $options;
@@ -97,15 +95,15 @@ abstract class DefaultPluginManager implements PluginManagerInterface
      * {@inheritDoc}
      */
     public function createInstance(
-        string $plugin_id,
+        string $pluginId,
         array $configurations = []
     ): PluginInterface {
         $pluginArgHash = serialize($configurations);
-        $pluginCacheId = sha1("{$plugin_id}:{$pluginArgHash}");
+        $pluginCacheId = sha1("{$pluginId}:{$pluginArgHash}");
 
         if (!isset(static::$pluginInstances[$pluginCacheId])) {
             static::$pluginInstances[$pluginCacheId] = $this->instantiatePluginInstance(
-                $plugin_id,
+                $pluginId,
                 $configurations
             );
         }
@@ -122,7 +120,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
      *   An array of plugin configurations keyed by the plugin id.
      *
      * @return array
-     *   An array of plugin instances that match the defined interface.
+     *   An array of instantiated plugins that matched an interface.
      */
     public function loadInstancesWithInterface(
         string $interface,
@@ -130,7 +128,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     ): array {
         $instances = [];
 
-        foreach ($this->pluginClasses as $classname) {
+        foreach ($this->getPlugins() as $classname) {
             if (!is_subclass_of($classname, $interface)) {
                 continue;
             }
@@ -190,33 +188,28 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     }
 
     /**
-     * Find plugin by identifier.
+     * Get the plugins that were discovered.
      *
-     * @param string $plugin_id
-     *   The plugin identifier.
-     * @param array $plugins
-     *   An array of plugins.
-     *
-     * @return bool|string
-     *   Return a plugin class name; otherwise false if not found.
+     * @return array
+     *   An array of plugin classes that were discovered.
      */
-    protected function findPluginById(string $plugin_id, array $plugins)
+    protected function getPlugins(): array
     {
-        $interface = PluginInterface::class;
+        if (empty($this->plugins)) {
+            $classes = $this->discover($this->classDiscovery);
 
-        /** @var \Pr0jectX\Px\PluginInterface $class_name */
-        foreach ($plugins as $class_name) {
-            if (
-                !class_exists($class_name)
-                || !is_subclass_of($class_name, $interface)
-                || $class_name::pluginId() !== $plugin_id
-            ) {
-                continue;
+            /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $pluginClass */
+            foreach ($classes as $pluginClass) {
+                if (
+                    !class_exists($pluginClass)
+                    || !is_subclass_of($pluginClass, PluginInterface::class)
+                ) {
+                    continue;
+                }
+                $this->plugins[$pluginClass::pluginId()] = $pluginClass;
             }
-
-            return $class_name;
         }
 
-        return false;
+        return $this->plugins;
     }
 }

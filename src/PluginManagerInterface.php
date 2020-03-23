@@ -5,13 +5,20 @@ declare(strict_types=1);
 namespace Pr0jectX\Px;
 
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
-use Robo\ClassDiscovery\ClassDiscoveryInterface;
 
 /**
  * Define the plugin manager interface.
  */
 interface PluginManagerInterface
 {
+    /**
+     * Discover the plugin classes.
+     *
+     * @return array
+     *   An array of plugin classnames.
+     */
+    public function discover(): array;
+
     /**
      * Get plugin options.
      *
@@ -23,36 +30,26 @@ interface PluginManagerInterface
     /**
      * Get plugin class name.
      *
-     * @param string $plugin_id
+     * @param string $pluginId
      *   The plugin identifier.
      *
-     * @return bool|string
-     *   Return the plugin class name; otherwise false.
+     * @return string
+     *   Return the plugin class name; otherwise an empty string.
      */
-    public function getClassname(string $plugin_id);
-
-    /**
-     * Discover the plugin classes.
-     *
-     * @param \Robo\ClassDiscovery\ClassDiscoveryInterface $classDiscovery
-     *
-     * @return array
-     *   An array of plugin classnames.
-     */
-    public function discover(ClassDiscoveryInterface $classDiscovery): array;
+    public function getClassname(string $pluginId);
 
     /**
      * Create the plugin instance.
      *
-     * @param string $name
-     *   The plugin machine name.
+     * @param string $pluginId
+     *   The plugin identifier.
      * @param array $configurations
      *   The plugin configurations.
      *
-     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface The instantiated plugin class.
+     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
      *   The instantiated plugin class.
      */
-    public function createInstance(string $name, array $configurations): PluginInterface;
+    public function createInstance(string $pluginId, array $configurations): PluginInterface;
 
     /**
      * Load plugin instance with interface.
