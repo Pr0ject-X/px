@@ -72,7 +72,7 @@ trait IOExtraTrait
     }
 
     /**
-     * Display a choice question.
+     * Ask a question with multiple choices.
      *
      * @param string $question
      *   The question to ask.
@@ -82,12 +82,33 @@ trait IOExtraTrait
      *   The default question answer if empty.
      *
      * @return string
-     *   The selected choice response.
+     *   The selected choice answer.
      */
-    protected function choice(string $question, array $choices, string $default = null): string
+    protected function askChoice(string $question, array $choices, string $default = null): string
     {
         return $this->doAsk(
-            new ChoiceQuestion($this->formatQuestionDefault($question, $default), $choices, $default)
+            $this->choice($question, $choices, $default)
+        );
+    }
+
+    /**
+     * Get the formatted choice question.
+     *
+     * @param string $question
+     *   The question to ask.
+     * @param array $choices
+     *   An array of the question choices.
+     * @param string $default
+     *   The default question answer if empty.
+     *
+     * @return \Symfony\Component\Console\Question\ChoiceQuestion
+     */
+    protected function choice(string $question, array $choices, string $default = null): ChoiceQuestion
+    {
+        return new ChoiceQuestion(
+            $this->formatQuestionDefault($question, $default),
+            $choices,
+            $default
         );
     }
 

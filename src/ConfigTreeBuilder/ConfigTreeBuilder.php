@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Pr0jectX\Px\ConfigTreeBuilder;
 
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\Input;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -38,11 +38,12 @@ class ConfigTreeBuilder
     /**
      * Set the question input stream.
      *
-     * @param \Symfony\Component\Console\Input\Input $input
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     *   The symfony input instance.
      *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function setQuestionInput(Input $input): ConfigTreeBuilder
+    public function setQuestionInput(InputInterface $input): ConfigTreeBuilder
     {
         $this->input = $input;
 
@@ -52,10 +53,12 @@ class ConfigTreeBuilder
     /**
      * Set the question output stream.
      *
-     * @param \Symfony\Component\Console\Output\Output $output
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *   The symfony input instance.
+     *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder
      */
-    public function setQuestionOutput(Output $output): ConfigTreeBuilder
+    public function setQuestionOutput(OutputInterface $output): ConfigTreeBuilder
     {
         $this->output = $output;
 

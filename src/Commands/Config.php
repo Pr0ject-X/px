@@ -27,7 +27,7 @@ class Config extends CommandTasksBase
         print PxApp::displayBanner();
 
         if (!isset($name)) {
-            $name = $this->choice(
+            $name = $this->askChoice(
                 'Set plugin configuration for',
                 $this->configOptions()
             );
@@ -116,6 +116,24 @@ class Config extends CommandTasksBase
     }
 
     /**
+     * Structure YAML configuration.
+     *
+     * @param array $export
+     *   An array of exported data.
+     *
+     * @return string
+     *   A structured YAML configuration.
+     */
+    protected function structureYmlConfiguration(array $export): string
+    {
+        $cleanedExport = array_filter($export, function ($value, $key) {
+            return !in_array($key, ['options']);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return Yaml::dump($cleanedExport, 10, 4);
+    }
+
+    /**
      * Save the plugin configurations.
      *
      * @param array $configurations
@@ -129,12 +147,12 @@ class Config extends CommandTasksBase
         $projectRoot = PxApp::projectRootPath();
         $configFilename = PxApp::CONFIG_FILENAME;
 
-        $pluginConfig = PxApp::getConfiguration()
+        $configExport = PxApp::getConfiguration()
             ->set('plugins', $configurations)
             ->export();
 
         $results = $this->taskWriteToFile("{$projectRoot}/{$configFilename}.yml")
-            ->text(Yaml::dump($pluginConfig, 10, 4))
+            ->text($this->structureYmlConfiguration($configExport))
             ->run();
 
         return $results->wasSuccessful();

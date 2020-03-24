@@ -111,8 +111,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     public function pluginConfiguration(): ConfigTreeBuilder
     {
         $envType = PxApp::getEnvironmentType();
-        $envOptions = $this->pluginManager->getOptions(['localhost']);
-
+        $envOptions = $this->pluginManager->getOptions();
         return (new ConfigTreeBuilder())
             ->setQuestionInput($this->input)
             ->setQuestionOutput($this->output)
@@ -120,7 +119,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
                 ->setValue($this->choice(
                     'Select the environment type',
                     $envOptions,
-                    $envType !== 'localhost' ? $envType : ''
+                    $envType
                 ))
             ->end();
     }

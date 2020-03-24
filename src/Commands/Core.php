@@ -87,7 +87,7 @@ class Core extends CommandTasksBase
     {
         $options = $this->globalProjectOptions();
 
-        $project = $this->choice(
+        $project = $this->askChoice(
             'Select the project',
             $options
         );

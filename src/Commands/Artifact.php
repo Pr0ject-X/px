@@ -257,7 +257,7 @@ class Artifact extends CommandTasksBase
             $choices = $this->deployTypePluginManager()->getOptions();
 
             if (count($choices) > 1) {
-                $pluginId = $this->choice(
+                $pluginId = $this->askChoice(
                     'What deploy type do you need help with?',
                     $choices
                 );

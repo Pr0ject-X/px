@@ -13,9 +13,10 @@ abstract class TestCaseBase extends TestCase
     /** @var \Pr0jectX\Px\PxApp  */
     protected $app;
 
+    /** @var \org\bovigo\vfs\vfsStreamDirectory  */
     protected $projectFilesystem;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->setupProjectFilesystem();
         $this->app = new PxApp();
@@ -23,7 +24,10 @@ abstract class TestCaseBase extends TestCase
             vfsStream::url('root/var/www/html')
         );
         PxApp::createContainer(
-            null, null, $this->app, $this->defineClassAutoloader()
+            null,
+            null,
+            $this->app,
+            $this->defineClassAutoloader()
         );
     }
 

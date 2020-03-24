@@ -11,8 +11,8 @@ use Robo\ClassDiscovery\ClassDiscoveryInterface;
 use Robo\Collection\CollectionBuilder;
 use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\IOAwareInterface;
-use Symfony\Component\Console\Input\Input;
-use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Define the default plugin manager.
@@ -47,16 +47,16 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     /**
      * Define the default plugin manager constructor.
      *
-     * @param \Symfony\Component\Console\Input\Input $input
+     * @param \Symfony\Component\Console\Input\InputInterface $input
      *   The symfony console input.
-     * @param \Symfony\Component\Console\Output\Output $output
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
      *   The symfony console output.
      * @param \Robo\ClassDiscovery\ClassDiscoveryInterface $class_discovery
      *   The class discovery service.
      */
     public function __construct(
-        Input $input,
-        Output $output,
+        InputInterface $input,
+        OutputInterface $output,
         ClassDiscoveryInterface $class_discovery
     ) {
         $this->input = $input;
