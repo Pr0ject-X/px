@@ -13,14 +13,14 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class PxAppTest extends TestCaseBase
 {
-    public function testDisplayBanner() : void
+    public function testDisplayBanner(): void
     {
         $this->assertNotEmpty(
             PxApp::displayBanner()
         );
     }
 
-    public function testDisplayVersion() : void
+    public function testDisplayVersion(): void
     {
         $this->assertRegExp(
             "/\d+\.\d+.\d+/",
@@ -28,7 +28,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testService() : void
+    public function testService(): void
     {
         $this->assertInstanceOf(
             InputInterface::class,
@@ -39,7 +39,7 @@ class PxAppTest extends TestCaseBase
         PxApp::service('notfound');
     }
 
-    public function testGetContainer() : void
+    public function testGetContainer(): void
     {
         $this->assertInstanceOf(
             ContainerInterface::class,
@@ -47,14 +47,14 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testHasContainer() : void
+    public function testHasContainer(): void
     {
         $this->assertTrue(
             PxApp::hasContainer()
         );
     }
 
-    public function testUserDir() : void
+    public function testUserDir(): void
     {
         $this->assertEquals(
             'vfs://root/home/jackie',
@@ -62,7 +62,12 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testGlobalTempDir() : void
+    public function testUserShell(): void
+    {
+        $this->assertEquals('zsh', PxApp::userShell());
+    }
+
+    public function testGlobalTempDir(): void
     {
         $this->assertEquals(
             'vfs://root/home/jackie/.project-x',
@@ -70,7 +75,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testProjectTempDir() : void
+    public function testProjectTempDir(): void
     {
         $this->assertEquals(
             'vfs://root/var/www/html/.project-x',
@@ -78,7 +83,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testProjectRootPath() : void
+    public function testProjectRootPath(): void
     {
         $this->assertEquals(
             'vfs://root/var/www/html',
@@ -95,7 +100,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testGetEnvironmentType() : void
+    public function testGetEnvironmentType(): void
     {
         $this->assertEquals(
             'localhost',
@@ -103,7 +108,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testGetEnvironmentInstance() : void
+    public function testGetEnvironmentInstance(): void
     {
         $this->assertInstanceOf(
             EnvironmentTypeInterface::class,
@@ -111,7 +116,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testGetConfiguration() : void
+    public function testGetConfiguration(): void
     {
         $this->assertInstanceOf(
             Config::class,
@@ -119,7 +124,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testGetProjectComposer() : void
+    public function testGetProjectComposer(): void
     {
         PxApp::loadProjectComposer();
         $this->assertNotEmpty(
@@ -127,7 +132,7 @@ class PxAppTest extends TestCaseBase
         );
     }
 
-    public function testComposerHasPackage() : void
+    public function testComposerHasPackage(): void
     {
         PxApp::loadProjectComposer();
         $this->assertFalse(

@@ -237,6 +237,25 @@ class PxApp extends Application
     }
 
     /**
+     * Define the project user shell.
+     *
+     * @return string
+     *   The user current shell.
+     */
+    public static function userShell(): string
+    {
+        $userShell = (string) getenv('PX_USER_SHELL');
+        $userShell = !empty($userShell)
+            ? $userShell
+            : getenv('SHELL');
+
+        return substr(
+            $userShell,
+            strrpos($userShell, '/') + 1
+        ) ?: '';
+    }
+
+    /**
      * Define the project global temporary directory.
      *
      * @return string

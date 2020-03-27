@@ -6,15 +6,15 @@ namespace Pr0jectX\Px\Tests;
 
 use Pr0jectX\Px\PxApp;
 use Robo\Runner;
-use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Define the test case command base class.
  */
 abstract class TestCaseCommandBase extends TestCaseBase
 {
-    protected $command;
-
+    /**
+     * {@inheritDoc}
+     */
     public function setUp(): void
     {
         parent::setUp();
@@ -23,16 +23,7 @@ abstract class TestCaseCommandBase extends TestCaseBase
             $this->app,
             $this->commandClasses()
         );
-
-        $this->command = new CommandTester(
-            $this->app->find($this->commandName())
-        );
     }
-
-    /**
-     * @return string
-     */
-    abstract protected function commandName(): string;
 
     /**
      * @return array

@@ -19,6 +19,7 @@
         </whitelist>
     </filter>
     <php>
+        <env name="PX_USER_SHELL" value="/bin/zsh" force="true" />
         <env name="PX_USER_DIR" value="vfs://root/home/jackie" force="true" />
     </php>
 </phpunit>

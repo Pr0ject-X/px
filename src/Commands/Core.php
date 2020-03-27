@@ -2,9 +2,12 @@
 
 namespace Pr0jectX\Px\Commands;
 
+use Packagist\Api\Client;
+use Packagist\Api\Result\Result;
 use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\CommonCommandTrait;
 use Pr0jectX\Px\PxApp;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
 /**
@@ -20,6 +23,61 @@ class Core extends CommandTasksBase
     const DEFAULT_PROJECT_FILE = 'projects.json';
 
     /**
+     * Search and install project-x plugins.
+     *
+     * @param string $searchTerm
+     *   The search term to filter out plugins; otherwise all plugins are shown.
+     *
+     * @param array $opts
+     * @option $working-directory The composer working directory.
+     *
+     * @aliases install
+     */
+    public function coreInstall(string $searchTerm = null, $opts = ['working-directory' => null]): void
+    {
+        $query = $searchTerm ?? "";
+        $options = $this->getProjectXPluginOptions($query);
+
+        if (empty($options)) {
+            $this->error(
+                sprintf("Unable to locate a project-x plugin matching '%s'!
+                \r\t Please try again with another search term.", $query)
+            );
+            return;
+        }
+
+        $packageNames = $this->doAsk(
+            (new ChoiceQuestion(
+                $this->formatQuestion('Select the project-x plugin(s) to install?'),
+                $options
+            ))->setMultiselect(true)
+        );
+
+        $packageList = implode(',', $packageNames);
+        $interaction = !$opts['no-interaction'] ?? true;
+        $workingDirectory = $opts['working-directory']
+            ?? PxApp::projectRootPath();
+
+        $result = $this->taskComposerRequire()
+            ->dev()
+            ->args($packageNames)
+            ->interactive($interaction)
+            ->workingDir($workingDirectory)
+            ->run();
+
+        if (!$result->wasSuccessful()) {
+            $this->error(
+                sprintf('The %s plugin had an error on installation.', $packageList)
+            );
+            return;
+        }
+
+        $this->success(
+            sprintf('The %s plugin was successfully installed.', $packageList)
+        );
+    }
+
+    /**
      * Save the project location.
      *
      * @param string|null $name
@@ -28,7 +86,7 @@ class Core extends CommandTasksBase
      * @option $edit
      *   Set if you want to manually edit this file.
      */
-    public function coreSave(string $name = null, array $opts = ['edit' => false])
+    public function coreSave(string $name = null, array $opts = ['edit' => false]): void
     {
         if (!isset($opts['edit']) || !$opts['edit']) {
             $name = isset($name) ? $name : $this->askProjectName();
@@ -83,7 +141,7 @@ class Core extends CommandTasksBase
      *   If set the raw output will be returned.
      * @aliases switch
      */
-    public function coreSwitch($opts = ['raw' => false])
+    public function coreSwitch($opts = ['raw' => false]): void
     {
         $options = $this->globalProjectOptions();
 
@@ -101,7 +159,7 @@ class Core extends CommandTasksBase
         if ($changeDir !== PxApp::projectRootPath()) {
             if (isset($opts['raw']) && $opts['raw']) {
                 print "$changeDir";
-                exit();
+                return;
             }
             $command = "cd {$changeDir} && vendor/bin/px env:up";
 
@@ -130,7 +188,7 @@ class Core extends CommandTasksBase
     /**
      * Add the CLI integration into your shell (e.g .bashrc, .zshrc).
      */
-    public function coreCliShortcut()
+    public function coreCliShortcut(): void
     {
         $userShellRcFile = $this->getUserShellRcFile();
 
@@ -171,33 +229,6 @@ class Core extends CommandTasksBase
     }
 
     /**
-     * Get host user home.
-     *
-     * @return string|null
-     *   The host environment user home.
-     */
-    protected function getUserHome(): string
-    {
-        return getenv('HOME') ?: null;
-    }
-
-    /**
-     * Get host user shell.
-     *
-     * @return string|null
-     *   The host environment user shell.
-     */
-    protected function getUserShell(): string
-    {
-        $shell = getenv('SHELL');
-
-        return substr(
-            $shell,
-            strrpos($shell, '/') + 1
-        ) ?: '';
-    }
-
-    /**
      * Get host user shell RC filepath.
      *
      * @return string
@@ -205,7 +236,10 @@ class Core extends CommandTasksBase
      */
     protected function getUserShellRcFile(): string
     {
-        return "{$this->getUserHome()}/.{$this->getUserShell()}rc";
+        $userShell = PxApp::userShell();
+        $userHomeDir = PxApp::userDir();
+
+        return "{$userHomeDir}/.{$userShell}rc";
     }
 
     /**
@@ -228,6 +262,47 @@ class Core extends CommandTasksBase
     protected function getSwitcherContents(): string
     {
         return file_get_contents(APPLICATION_ROOT . '/templates/core/switcher.txt');
+    }
+
+    /**
+     * Get the project-x plugin options.
+     *
+     * @param string $query
+     *   The project-x plugin search query.
+     *
+     * @return array
+     *   An array of project-x plugin options.
+     */
+    protected function getProjectXPluginOptions(string $query): array
+    {
+        $options = [];
+
+        /** @var \Packagist\Api\Result\Result $result */
+        foreach ($this->searchProjectXPlugins($query) as $result) {
+            if (!$result instanceof Result) {
+                continue;
+            }
+            $options[] = $result->getName();
+        }
+
+        return $options;
+    }
+
+    /**
+     * Search for a project-x plugin based on the given query.
+     *
+     * @param string $query
+     *   The project-x plugin search query.
+     *
+     * @return array
+     *   An array of \Packagist\Api\Result\Result objects.
+     */
+    protected function searchProjectXPlugins(string $query): array
+    {
+        return (new Client())->search(
+            $query,
+            ['type' => 'px-plugin']
+        );
     }
 
     /**

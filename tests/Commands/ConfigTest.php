@@ -6,6 +6,7 @@ namespace Pr0jectX\Px\Tests\Commands;
 
 use Pr0jectX\Px\Commands\Config;
 use Pr0jectX\Px\Tests\TestCaseCommandBase;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -13,14 +14,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 class ConfigTest extends TestCaseCommandBase
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected function commandName(): string
-    {
-        return 'config:set';
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -33,7 +26,9 @@ class ConfigTest extends TestCaseCommandBase
     {
         $this->setCommandInputs(['localhost']);
 
-        $this->command->execute([
+        $commandStatus = (new CommandTester(
+            $this->app->find('config:set')
+        ))->execute([
             'name' => 'environment'
         ]);
 
@@ -47,7 +42,7 @@ class ConfigTest extends TestCaseCommandBase
                 ]
             ]
         ];
+        $this->assertEquals(0, $commandStatus);
         $this->assertEquals($expectedConfig, $configFile);
-        $this->assertEquals(0, $this->command->getStatusCode());
     }
 }
