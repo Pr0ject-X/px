@@ -35,14 +35,13 @@ class ConfigTest extends TestCaseCommandBase
         $configFile = Yaml::parseFile(
             'vfs://root/var/www/html/project-x.yml'
         );
+
         $expectedConfig = [
-            'plugins' => [
-                'environment' => [
-                    'type' => 'localhost'
-                ]
+            'environment' => [
+                'type' => 'localhost'
             ]
         ];
         $this->assertEquals(0, $commandStatus);
-        $this->assertEquals($expectedConfig, $configFile);
+        $this->assertEquals($expectedConfig, $configFile['plugins']);
     }
 }

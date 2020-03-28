@@ -2,10 +2,12 @@
 
 namespace Pr0jectX\Px\Commands;
 
+use Consolidation\AnnotatedCommand\CommandData;
 use Packagist\Api\Client;
 use Packagist\Api\Result\Result;
 use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\CommonCommandTrait;
+use Pr0jectX\Px\HookExecuteType\ExecuteHookTaskTrait;
 use Pr0jectX\Px\PxApp;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -16,11 +18,35 @@ use Symfony\Component\Console\Question\Question;
 class Core extends CommandTasksBase
 {
     use CommonCommandTrait;
+    use ExecuteHookTaskTrait;
 
     /**
      * @var string
      */
     const DEFAULT_PROJECT_FILE = 'projects.json';
+
+    /**
+     * @hook pre-command *
+     *
+     * @param \Consolidation\AnnotatedCommand\CommandData $commandData
+     */
+    public function corePreCommandHook(CommandData $commandData)
+    {
+        $this->executeHookCollectionTasks($commandData, 'pre');
+    }
+
+    /**
+     * @hook post-command *
+     *
+     * @param $result
+     *   The post command result.
+     *
+     * @param \Consolidation\AnnotatedCommand\CommandData $commandData
+     */
+    public function corePostCommandHook($result, CommandData $commandData)
+    {
+        $this->executeHookCollectionTasks($commandData, 'post');
+    }
 
     /**
      * Search and install project-x plugins.

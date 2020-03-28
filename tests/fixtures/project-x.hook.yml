@@ -1,0 +1,20 @@
+
+hook:
+    core:
+        bogus:
+            pre:
+                - type: shell
+                  command: 'echo "Hello Pre World 1"'
+                - type: symfony
+                  command: 'env:start'
+                  arguments:
+                    - name: 'test'
+                - 'echo "Hello Pre World 2"'
+            post:
+                - type: shell
+                  command: 'echo "Hello Post World 1"'
+                - type: symfony
+                  command: 'env:stop'
+                  arguments:
+                    - name: 'test'
+                - 'echo "Hello Post World 2"'
