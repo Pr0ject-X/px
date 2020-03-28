@@ -196,7 +196,7 @@ abstract class DefaultPluginManager implements PluginManagerInterface
     protected function getPlugins(): array
     {
         if (empty($this->plugins)) {
-            $classes = $this->discover($this->classDiscovery);
+            $classes = $this->discover();
 
             /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $pluginClass */
             foreach ($classes as $pluginClass) {

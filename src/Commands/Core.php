@@ -23,7 +23,7 @@ class Core extends CommandTasksBase
     /**
      * @var string
      */
-    const DEFAULT_PROJECT_FILE = 'projects.json';
+    protected const DEFAULT_PROJECT_FILE = 'projects.json';
 
     /**
      * @hook pre-command *
@@ -127,13 +127,15 @@ class Core extends CommandTasksBase
                 $project
             );
 
-            if ($status = $this->saveGlobalProject($data)) {
+            if ($this->saveGlobalProject($data)) {
                 $this->success(
                     sprintf('The "%s" project was successfully added!', $name)
                 );
                 return;
             }
-            $this->error('The "%s" project failed to be added!', $name);
+            $this->error(
+                sprintf('The "%s" project failed to be added!', $name)
+            );
         }
 
         $this->taskExec("open {$this->globalProjectFilename()}")->run();
@@ -149,7 +151,7 @@ class Core extends CommandTasksBase
             $name = $data[PxApp::projectRootPath()]['name'];
             unset($data[PxApp::projectRootPath()]);
 
-            if ($status = $this->saveGlobalProject($data)) {
+            if ($this->saveGlobalProject($data)) {
                 $this->success(
                     sprintf('The "%s" project was successfully removed!', $name)
                 );

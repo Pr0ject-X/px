@@ -11,7 +11,10 @@ use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 /**
  * Define the environment type interface.
  */
-interface EnvironmentTypeInterface extends PluginInterface, PluginConfigurationBuilderInterface, PluginCommandRegisterInterface
+interface EnvironmentTypeInterface extends
+    PluginInterface,
+    PluginConfigurationBuilderInterface,
+    PluginCommandRegisterInterface
 {
     /**
      * Initial the environment.

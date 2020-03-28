@@ -29,13 +29,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 class PxApp extends Application
 {
     /** @var string  */
-    const CONFIG_FILENAME = 'project-x';
+    public const CONFIG_FILENAME = 'project-x';
 
     /** @var string  */
-    const APPLICATION_NAME = 'Project-X';
+    protected const APPLICATION_NAME = 'Project-X';
 
     /** @var string  */
-    const PLUGIN_NAMESPACE = 'ProjectX\Plugin';
+    protected const PLUGIN_NAMESPACE = 'ProjectX\Plugin';
 
     /**
      * @var \League\Container\ContainerInterface
@@ -569,8 +569,9 @@ class PxApp extends Application
             return $searchPath;
         }
         $searchDirs = explode('/', $searchPath);
+        $searchDirCount = count($searchDirs);
 
-        for ($i = 1; $i < count($searchDirs) - 1; $i++) {
+        for ($i = 1; $i < $searchDirCount - 1; $i++) {
             $searchDir = implode('/', array_slice($searchDirs, 0, -$i));
 
             if (file_exists("{$searchDir}/{$filename}")) {

@@ -1,7 +1,6 @@
 <?php
 
 use Pr0jectX\Px\PxApp;
-use Robo\Robo;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 

@@ -32,8 +32,7 @@ trait ExecuteHookTaskTrait
 
         $hookCommands = (new HookExecuteManager(
             $config,
-            $commandData,
-            $this->collectionBuilder()
+            $commandData
         ))->buildCommands($hookType);
 
         $collection = $this->collectionBuilder();
@@ -132,7 +131,7 @@ trait ExecuteHookTaskTrait
      */
     protected function commandArgumentIsValid(array $arguments): bool
     {
-        foreach ($arguments as $key => $value) {
+        foreach ($arguments as $value) {
             if (is_array($value)) {
                 return false;
             }

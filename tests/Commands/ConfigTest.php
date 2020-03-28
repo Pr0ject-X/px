@@ -42,6 +42,7 @@ class ConfigTest extends TestCaseCommandBase
             ]
         ];
         $this->assertEquals(0, $commandStatus);
+        $this->assertArrayNotHasKey('options', $configFile);
         $this->assertEquals($expectedConfig, $configFile['plugins']);
     }
 }

@@ -11,7 +11,7 @@ use Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase;
  */
 class MySql extends ExecutableBuilderBase
 {
-    const EXECUTABLE = 'mysql';
+    protected const EXECUTABLE = 'mysql';
 
     /**
      * Set the MySql database.

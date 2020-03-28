@@ -9,5 +9,5 @@ namespace Pr0jectX\Px\ExecutableBuilder\Commands;
  */
 class MySqlDump extends MySql
 {
-    const EXECUTABLE = 'mysqldump';
+    protected const EXECUTABLE = 'mysqldump';
 }

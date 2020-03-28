@@ -126,9 +126,9 @@ class Config extends CommandTasksBase
      */
     protected function structureYmlConfiguration(array $export): string
     {
-        $cleanedExport = array_filter($export, function ($value, $key) {
+        $cleanedExport = array_filter($export, function ($key) {
             return !in_array($key, ['options']);
-        }, ARRAY_FILTER_USE_BOTH);
+        }, ARRAY_FILTER_USE_KEY);
 
         return Yaml::dump($cleanedExport, 10, 4);
     }

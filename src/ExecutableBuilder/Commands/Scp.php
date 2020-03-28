@@ -11,9 +11,9 @@ use Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase;
  */
 class Scp extends ExecutableBuilderBase
 {
-    const EXECUTABLE = 'scp';
+    protected const EXECUTABLE = 'scp';
 
-    const OPTION_DELIMITER = ' ';
+    protected const OPTION_DELIMITER = ' ';
 
     /**
      * @var string

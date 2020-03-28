@@ -123,7 +123,7 @@ class CoreTest extends TestCaseCommandBase
             ]
         ]);
         $globalTempDir = PxApp::globalTempDir();
-        $globalProjectsTempFile = "{$globalTempDir}/projects.json";
+        $globalTempFile = "{$globalTempDir}/projects.json";
 
         $expected[$projectRoot] = [
             'name' => 'Project Name',
@@ -131,7 +131,7 @@ class CoreTest extends TestCaseCommandBase
         ];
 
         $this->assertEquals($expected, json_decode(
-            file_get_contents($globalProjectsTempFile),
+            file_get_contents($globalTempFile),
             true
         ));
 
@@ -141,7 +141,7 @@ class CoreTest extends TestCaseCommandBase
 
         $this->assertEquals(0, $commandStatus);
         $this->assertEquals("[]", file_get_contents(
-            $globalProjectsTempFile
+            $globalTempFile
         ));
     }
 

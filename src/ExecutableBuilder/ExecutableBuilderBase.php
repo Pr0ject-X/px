@@ -12,12 +12,12 @@ abstract class ExecutableBuilderBase
     /**
      * Set the executable.
      */
-    const EXECUTABLE = '';
+    protected const EXECUTABLE = '';
 
     /**
      * Set the executable option delimiter.
      */
-    const OPTION_DELIMITER = '=';
+    protected const OPTION_DELIMITER = '=';
 
     /** @var array  */
     protected $options = [];
