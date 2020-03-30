@@ -62,13 +62,18 @@ abstract class ExecutableBuilderBase
      *
      * @param string $parameter
      *   The executable parameter.
-     * @param string $value
+     * @param $value
      *   The executable parameter value.
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setOption(string $parameter, string $value): ExecutableBuilderBase
+    public function setOption(string $parameter, $value): ExecutableBuilderBase
     {
+        if (!is_scalar($value)) {
+            throw new \InvalidArgumentException(
+                'Invalid option value. Only scalar values are allowed.'
+            );
+        }
         $this->options[$parameter] = $value;
 
         return $this;
@@ -106,7 +111,7 @@ abstract class ExecutableBuilderBase
                 ? $parameter
                 : "--{$parameter}";
 
-            $options[] = "{$option}{$delimiter}\"{$value}\"";
+            $options[] = "{$option}{$delimiter}'{$value}'";
         }
 
         return $options;
