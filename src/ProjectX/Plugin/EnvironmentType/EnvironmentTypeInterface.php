@@ -17,6 +17,16 @@ interface EnvironmentTypeInterface extends
     PluginCommandRegisterInterface
 {
     /**
+     * @var string
+     */
+    public const ENVIRONMENT_DB_PRIMARY = 'primary';
+
+    /**
+     * @var string
+     */
+    public const ENVIRONMENT_DB_SECONDARY = 'secondary';
+
+    /**
      * Initial the environment.
      *
      * @param array $opts
@@ -103,4 +113,22 @@ interface EnvironmentTypeInterface extends
      *   An array of environment packages.
      */
     public function envPackages(): array;
+
+    /**
+     * Define the environment databases.
+     *
+     * @return array
+     *   An array of \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase keyed by name.
+     */
+    public function envDatabases(): array;
+
+    /**
+     * Select the environment database.
+     *
+     * @param string $name
+     *   The name of the database key.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase
+     */
+    public function selectEnvDatabase(string $name): EnvironmentDatabase;
 }

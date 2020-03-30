@@ -98,6 +98,14 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
+    public function envDatabases(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function registeredCommands(): array
     {
         return [
@@ -122,5 +130,29 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
                     $envType
                 ))
             ->end();
+    }
+
+    /**
+     * Select the environment database.
+     *
+     * @param string $name
+     *   The name of the database key.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase
+     */
+    public function selectEnvDatabase(string $name): EnvironmentDatabase
+    {
+        $databases = $this->envDatabases();
+
+        if (
+            !isset($databases[$name])
+            || !$databases[$name] instanceof EnvironmentDatabase
+        ) {
+            throw new \InvalidArgumentException(
+                sprintf('Unable to locate the %s database!', $name)
+            );
+        }
+
+        return $databases[$name];
     }
 }
