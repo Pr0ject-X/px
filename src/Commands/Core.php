@@ -199,24 +199,24 @@ class Core extends CommandTasksBase
     /**
      * Switch to another saved project directory.
      *
+     * @param null $project
+     *   The project name.
      * @param array $opts
      * @option $raw
      *   If set the raw output will be returned.
      * @aliases switch
      */
-    public function coreSwitch($opts = ['raw' => false]): void
+    public function coreSwitch($project = null, $opts = ['raw' => false]): void
     {
         $options = $this->globalProjectOptions();
 
-        $project = $this->askChoice(
-            'Select the project',
-            $options
-        );
-        if (!isset($options[$project])) {
+        if (isset($project) && !isset($options[$project])) {
             throw new \RuntimeException(
                 sprintf('The project "%s" is an invalid option.', $project)
             );
         }
+        $project = $project ?? $this->askChoice('Select the project', $options);
+
         $changeDir = $options[$project];
 
         if ($changeDir !== PxApp::projectRootPath()) {
@@ -234,9 +234,9 @@ class Core extends CommandTasksBase
             ));
 
             if ($this->confirm('Stop the current project environment?', true)) {
-                if ($command = $this->findCommand('env:stop')) {
-                    $this->taskSymfonyCommand($command)->run();
-                }
+                $this->taskSymfonyCommand(
+                    $this->findCommand('env:stop')
+                )->run();
             }
             return;
         }
