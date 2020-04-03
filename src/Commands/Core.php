@@ -9,6 +9,7 @@ use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\CommonCommandTrait;
 use Pr0jectX\Px\HookExecuteType\ExecuteHookTaskTrait;
 use Pr0jectX\Px\PxApp;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
@@ -101,6 +102,40 @@ class Core extends CommandTasksBase
         $this->success(
             sprintf('The %s plugin was successfully installed.', $packageList)
         );
+    }
+
+    /**
+     * Display information about the project status.
+     *
+     * @aliases status
+     */
+    public function coreStatus()
+    {
+        print PxApp::displayBanner();
+        print PxApp::displayVersion();
+
+        $environmentInstance = PxApp::getEnvironmentInstance();
+
+        /** @var \Pr0jectX\Px\PluginManagerInterface $pluginManager */
+        $commandTypeManager = PxApp::service('commandTypePluginManager');
+
+        $inputOutput = $this->io();
+        $inputOutput->title('Loaded Settings');
+        $inputOutput->table([], [
+            ['User Shell', PxApp::userShell()],
+            ['Project Root', PxApp::projectRootPath()],
+            ['Composer Loaded', PxApp::hasProjectComposer() ? 'Yes️' : 'No'],
+            ['Plugin(s) Installed', implode(
+                ', ',
+                array_values($commandTypeManager->getOptions())
+            )],
+            new TableSeparator(),
+            ['Environment Type', PxApp::getEnvironmentType()],
+            ['Environment Status', $environmentInstance->isRunning() ? 'Running' : 'Stopped'],
+            new TableSeparator(),
+            ['Temp Directory (Global)', PxApp::globalTempDir()],
+            ['Temp Directory (Project)', PxApp::projectTempDir()],
+        ]);
     }
 
     /**

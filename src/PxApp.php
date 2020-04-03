@@ -113,6 +113,17 @@ class PxApp extends Application
     }
 
     /**
+     * Determine if the project composer.json has been loaded.
+     *
+     * @return bool
+     *   Return true if composer has been loaded; otherwise false.
+     */
+    public static function hasProjectComposer(): bool
+    {
+        return !empty(static::$projectComposer);
+    }
+
+    /**
      * Load the composer.json relevant to the project root.
      *
      * @throws \RuntimeException

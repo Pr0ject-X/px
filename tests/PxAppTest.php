@@ -124,6 +124,12 @@ class PxAppTest extends TestCaseBase
         );
     }
 
+    public function testHasProjectComposer()
+    {
+        PxApp::loadProjectComposer();
+        $this->assertTrue(PxApp::hasProjectComposer());
+    }
+
     public function testGetProjectComposer(): void
     {
         PxApp::loadProjectComposer();
