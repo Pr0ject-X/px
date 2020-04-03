@@ -23,9 +23,11 @@ class Environment extends CommandTasksBase
     }
 
     /**
-     * Display project environment info.
+     * Display project environment status.
+     *
+     * @aliases env:info
      */
-    public function envInfo()
+    public function envStatus()
     {
         $this->createInstance()->info();
     }
