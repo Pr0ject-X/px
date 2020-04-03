@@ -7,6 +7,7 @@ namespace Pr0jectX\Px\ProjectX\Plugin\EnvironmentType;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandRegisterInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
+use Pr0jectX\Px\State\DatastoreState;
 
 /**
  * Define the environment type interface.
@@ -25,6 +26,16 @@ interface EnvironmentTypeInterface extends
      * @var string
      */
     public const ENVIRONMENT_DB_SECONDARY = 'secondary';
+
+    /**
+     * @var string
+     */
+    public const ENVIRONMENT_STATUS_RUNNING = 'running';
+
+    /**
+     * @var string
+     */
+    public const ENVIRONMENT_STATUS_STOPPED = 'stopped';
 
     /**
      * Initial the environment.
@@ -97,6 +108,45 @@ interface EnvironmentTypeInterface extends
      *   An array of launch options.
      */
     public function launch(array $opts = []);
+
+    /**
+     * Get the environment status.
+     */
+    public function getStatus(): string;
+
+    /**
+     * Set the environment status.
+     *
+     * @param string $status
+     *   The environment status.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeBase
+     */
+    public function setStatus(string $status);
+
+    /**
+     * Get the environment state instance.
+     *
+     * @return \Pr0jectX\Px\State\DatastoreState
+     *   The datastore environment state instance.
+     */
+    public function getState(): DatastoreState;
+
+    /**
+     * Determine if the environment is running.
+     *
+     * @return bool
+     *   Return true if environment is running; otherwise false.
+     */
+    public function isRunning(): bool;
+
+    /**
+     * Determine if the environment is stopped.
+     *
+     * @return bool
+     *   Return true if environment is stopped; otherwise false.
+     */
+    public function isStopped(): bool;
 
     /**
      * Define the environment application root.

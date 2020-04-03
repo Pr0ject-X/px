@@ -6,9 +6,11 @@ namespace Pr0jectX\Px\ProjectX\Plugin\EnvironmentType;
 
 use Pr0jectX\Px\Commands\Environment;
 use Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder;
+use Pr0jectX\Px\Datastore\JsonDatastore;
 use Pr0jectX\Px\Exception\EnvironmentMethodNotSupported;
 use Pr0jectX\Px\ProjectX\Plugin\PluginTasksBase;
 use Pr0jectX\Px\PxApp;
+use Pr0jectX\Px\State\DatastoreState;
 
 /**
  * Define the environment type base class.
@@ -111,6 +113,52 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
         return [
             Environment::class
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getStatus(): string
+    {
+        return (string) $this->getState()->get('status') ?? 'unknown';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setStatus(string $status): EnvironmentTypeBase
+    {
+        $this->getState()->set('status', $status)->save();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isStopped(): bool
+    {
+        return $this->getStatus() === EnvironmentTypeInterface::ENVIRONMENT_STATUS_STOPPED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isRunning(): bool
+    {
+        return $this->getStatus() === EnvironmentTypeInterface::ENVIRONMENT_STATUS_RUNNING;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getState(): DatastoreState
+    {
+        return new DatastoreState(
+            new JsonDatastore(
+                PxApp::projectTempDir() . '/state/environment.json'
+            )
+        );
     }
 
     /**

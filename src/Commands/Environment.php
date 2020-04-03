@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px\Commands;
 
+use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Pr0jectX\Px\PxApp;
 use Pr0jectX\Px\CommandTasksBase;
@@ -52,6 +53,10 @@ class Environment extends CommandTasksBase
                 $this->taskSymfonyCommand($command)->run();
             }
         }
+
+        $this->createInstance()->setStatus(
+            EnvironmentTypeInterface::ENVIRONMENT_STATUS_RUNNING
+        );
     }
 
     /**
@@ -62,6 +67,16 @@ class Environment extends CommandTasksBase
     public function envStop()
     {
         $this->createInstance()->stop();
+    }
+
+    /**
+     * @hook post-command env:stop
+     */
+    public function postEnvStop()
+    {
+        $this->createInstance()->setStatus(
+            EnvironmentTypeInterface::ENVIRONMENT_STATUS_STOPPED
+        );
     }
 
     /**
