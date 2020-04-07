@@ -321,6 +321,27 @@ class PxApp extends Application
             PxApp::projectCacheDir()
         );
     }
+
+    /**
+     * Define the active PHP versions.
+     *
+     * @return array
+     *   An array of active PHP versions.
+     */
+    public static function activePhpVersions(): array
+    {
+        $majorVersion = 7;
+
+        $activeVersions = json_decode(
+            file_get_contents(
+                'https://www.php.net/releases/active.php'
+            ),
+            true
+        );
+
+        return array_keys($activeVersions[$majorVersion]);
+    }
+
     /**
      * Define the project root path.
      *
