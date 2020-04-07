@@ -6,7 +6,9 @@ namespace Pr0jectX\Px\ProjectX\Plugin;
 
 use Pr0jectX\Px\IOExtraTrait;
 use Pr0jectX\Px\PluginManagerInterface;
+use Pr0jectX\Px\PxApp;
 use Robo\Tasks;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * Define the plugin tasks base.
@@ -49,5 +51,13 @@ abstract class PluginTasksBase extends Tasks implements PluginInterface
     public function getConfigurations(): array
     {
         return $this->configurations;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPluginCache(): FilesystemAdapter
+    {
+        return PxApp::projectCache('plugin.' . static::pluginId());
     }
 }

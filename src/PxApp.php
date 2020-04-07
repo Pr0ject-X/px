@@ -19,6 +19,7 @@ use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\IOAwareInterface;
 use Robo\Robo;
 use Robo\Runner;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -289,6 +290,37 @@ class PxApp extends Application
         return static::projectRootPath() . '/.project-x';
     }
 
+    /**
+     * Define the project cache directory.
+     *
+     * @return string
+     *   The fully qualified path to the project cache directory.
+     */
+    public static function projectCacheDir(): string
+    {
+        return implode(DIRECTORY_SEPARATOR, [PxApp::projectTempDir(), 'cache']);
+    }
+
+    /**
+     * Retrieve the project default filesystem cache instance.
+     *
+     * @param string $namespace
+     *   The cache namespace.
+     * @param int $defaultLifetime
+     *   The default expiration time.
+     *
+     * @return \Symfony\Component\Cache\Adapter\FilesystemAdapter
+     */
+    public static function projectCache(
+        string $namespace = '',
+        int $defaultLifetime = 0
+    ): FilesystemAdapter {
+        return new FilesystemAdapter(
+            $namespace,
+            $defaultLifetime,
+            PxApp::projectCacheDir()
+        );
+    }
     /**
      * Define the project root path.
      *

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px\ProjectX\Plugin;
 
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+
 /**
  * Define plugin type interface.
  */
@@ -32,4 +34,11 @@ interface PluginInterface
      *   An array of the plugin configurations.
      */
     public function getConfigurations(): array;
+
+    /**
+     * Get the plugin cache instance.
+     *
+     * @return \Symfony\Component\Cache\Adapter\FilesystemAdapter
+     */
+    public function getPluginCache(): FilesystemAdapter;
 }
