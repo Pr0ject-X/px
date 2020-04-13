@@ -60,8 +60,10 @@ class Config extends CommandTasksBase
         /** @var \Pr0jectX\Px\PluginManagerInterface $pluginManager */
         $pluginManager = PxApp::service('commandTypePluginManager');
 
+        $pluginConfigurations = PxApp::getConfiguration()->get('plugins', []);
+
         /** @var \Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface $pluginInstance */
-        foreach ($pluginManager->loadInstancesWithInterface($interface) as $pluginId => $pluginInstance) {
+        foreach ($pluginManager->loadInstancesWithInterface($interface, $pluginConfigurations) as $pluginId => $pluginInstance) {
             $router[$pluginId]['class'] = $pluginInstance;
         }
 

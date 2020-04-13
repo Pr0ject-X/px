@@ -150,6 +150,9 @@ class ConfigTreeBuilder
                         $value
                     );
                 }
+                if (is_callable($value)) {
+                    $data[$index] = call_user_func_array($value, [$values]);
+                }
             }
         }
     }
