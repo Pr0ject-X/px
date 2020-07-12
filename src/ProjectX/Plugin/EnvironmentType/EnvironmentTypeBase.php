@@ -108,6 +108,14 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
+    public function execBuilderOptions(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function registeredCommands(): array
     {
         return [

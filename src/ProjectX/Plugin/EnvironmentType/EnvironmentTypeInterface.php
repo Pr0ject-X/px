@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px\ProjectX\Plugin\EnvironmentType;
 
+use Pr0jectX\Px\Contracts\ExecutableBuilderConfigurableInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandRegisterInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
@@ -15,7 +16,8 @@ use Pr0jectX\Px\State\DatastoreState;
 interface EnvironmentTypeInterface extends
     PluginInterface,
     PluginConfigurationBuilderInterface,
-    PluginCommandRegisterInterface
+    PluginCommandRegisterInterface,
+    ExecutableBuilderConfigurableInterface
 {
     /**
      * @var string

@@ -15,7 +15,12 @@ abstract class ExecutableBuilderBase
     protected const EXECUTABLE = '';
 
     /**
-     * Set the executable option delimiter.
+     * Set the executable default option quote.
+     */
+    protected const OPTION_QUOTE = '"';
+
+    /**
+     * Set the executable default option delimiter.
      */
     protected const OPTION_DELIMITER = '=';
 
@@ -24,6 +29,9 @@ abstract class ExecutableBuilderBase
 
     /** @var array  */
     protected $arguments = [];
+
+    /** @var array  */
+    protected $configOptions = [];
 
     /**
      * Set the executable argument.
@@ -97,6 +105,47 @@ abstract class ExecutableBuilderBase
     }
 
     /**
+     * Set the configuration options.
+     *
+     * @param array $configOptions
+     *   An array of the configuration options.
+     *
+     * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
+     */
+    public function setConfigOptions(array $configOptions): ExecutableBuilderBase
+    {
+        $this->configOptions = $configOptions;
+
+        return $this;
+    }
+
+    /**
+     * Get all configuration options.
+     *
+     * @return array|\string[]
+     */
+    protected function getConfigOptions(): array
+    {
+        return $this->configOptions + [
+            'quote' => static::OPTION_QUOTE,
+            'delimiter' => static::OPTION_DELIMITER,
+        ];
+    }
+
+    /**
+     * Get a single configuration option.
+     *
+     * @param string $name
+     *   The name of the configuration property.
+     *
+     * @return mixed|string
+     */
+    protected function getConfigOption(string $name)
+    {
+        return $this->getConfigOptions()[$name];
+    }
+
+    /**
      * Build the executable options.
      *
      * @return array
@@ -104,14 +153,16 @@ abstract class ExecutableBuilderBase
     protected function buildOptions(): array
     {
         $options = [];
-        $delimiter = static::OPTION_DELIMITER;
+
+        $quote = $this->getConfigOption('quote');
+        $delimiter = $this->getConfigOption('delimiter');
 
         foreach ($this->options as $parameter => $value) {
             $option = strpos($parameter, '-') === 0
                 ? $parameter
                 : "--{$parameter}";
 
-            $options[] = "{$option}{$delimiter}'{$value}'";
+            $options[] = "{$option}{$delimiter}{$quote}{$value}{$quote}";
         }
 
         return $options;
