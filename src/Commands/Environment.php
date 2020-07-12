@@ -114,7 +114,7 @@ class Environment extends CommandTasksBase
      * @option $schema
      *   The URL protocol to use.
      */
-    public function envLaunch(array $opts = ['schema' => 'http'])
+    public function envLaunch(array $opts = ['schema' => null])
     {
         $this->createInstance()->launch($opts);
     }
