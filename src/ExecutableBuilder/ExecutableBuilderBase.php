@@ -68,16 +68,16 @@ abstract class ExecutableBuilderBase
     /**
      * Set the executable option parameter value.
      *
-     * @param string $parameter
+     * @param $parameter
      *   The executable parameter.
      * @param $value
      *   The executable parameter value.
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\ExecutableBuilderBase
      */
-    public function setOption(string $parameter, $value): ExecutableBuilderBase
+    public function setOption($parameter, $value = null): ExecutableBuilderBase
     {
-        if (!is_scalar($value)) {
+        if (isset($value) && !is_scalar($value)) {
             throw new \InvalidArgumentException(
                 'Invalid option value. Only scalar values are allowed.'
             );
@@ -98,6 +98,14 @@ abstract class ExecutableBuilderBase
     public function setOptions(array $options): ExecutableBuilderBase
     {
         foreach ($options as $parameter => $value) {
+            $parameter = !is_numeric($parameter)
+                ? $parameter
+                : $value;
+
+            $value = $parameter !== $value
+                ? $value
+                : null;
+
             $this->setOption($parameter, $value);
         }
 
@@ -158,11 +166,15 @@ abstract class ExecutableBuilderBase
         $delimiter = $this->getConfigOption('delimiter');
 
         foreach ($this->options as $parameter => $value) {
-            $option = strpos($parameter, '-') === 0
+            $parameter = strpos($parameter, '-') === 0
                 ? $parameter
                 : "--{$parameter}";
 
-            $options[] = "{$option}{$delimiter}{$quote}{$value}{$quote}";
+            if (isset($value) && !empty($value)) {
+                $parameter .= "{$delimiter}{$quote}{$value}{$quote}";
+            }
+
+            $options[] = $parameter;
         }
 
         return $options;
