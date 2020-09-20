@@ -112,11 +112,34 @@ abstract class TestCaseBase extends TestCase
      */
     protected function setProjectXConfiguration(): vfsStreamFile
     {
+        $contents = $this->buildProjectXConfigContents();
+
         return vfsStream::newFile('project-x.yml', 0775)
-            ->setContent(file_get_contents(
-                __DIR__ . '/fixtures/project-x.hook.yml'
-            ))
+            ->setContent($contents)
             ->at($this->projectHtmlRoot);
+    }
+
+    /**
+     * Build project-x configuration contents.
+     *
+     * @return string
+     *   The project-x configuration contents.
+     */
+    protected function buildProjectXConfigContents(): string
+    {
+        $files = [
+            '/fixtures/project-x.hook.yml',
+            '/fixtures/project-x.workflow.yml'
+        ];
+        $contents = [];
+
+        foreach ($files as $filename) {
+            $contents[] = file_get_contents(
+                __DIR__ . $filename
+            );
+        }
+
+        return implode("\n", $contents);
     }
 
     /**

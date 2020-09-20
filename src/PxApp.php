@@ -10,10 +10,13 @@ use League\Container\ContainerInterface;
 use Pr0jectX\Px\Commands\Artifact;
 use Pr0jectX\Px\Commands\Config;
 use Pr0jectX\Px\Commands\Core;
+use Pr0jectX\Px\Commands\Workflow;
+use Pr0jectX\Px\ExecuteType\ExecuteTypeManager;
 use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandRegisterInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandTaskBase;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
+use Pr0jectX\Px\Workflow\WorkflowManager;
 use Robo\Collection\CollectionBuilder;
 use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\IOAwareInterface;
@@ -188,6 +191,13 @@ class PxApp extends Application
             );
 
             Robo::configureContainer($container, $app, $config, $input, $output, $classLoader);
+
+            $container->share('workflowManager', WorkflowManager::class)
+                ->withArguments([
+                    'config', 'relativeNamespaceDiscovery'
+                ]);
+
+            $container->share('executeTypeManager', ExecuteTypeManager::class);
 
             $container->share('deployTypePluginManager', DeployTypePluginManager::class)
                 ->withArguments([

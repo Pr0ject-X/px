@@ -7,8 +7,10 @@ use Packagist\Api\Client;
 use Packagist\Api\Result\Result;
 use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\CommonCommandTrait;
-use Pr0jectX\Px\HookExecuteType\ExecuteHookTaskTrait;
+use Pr0jectX\Px\HookExecute\HookExecuteManager;
+use Pr0jectX\Px\HookExecute\HookExecuteTaskTrait;
 use Pr0jectX\Px\PxApp;
+use Pr0jectX\Px\Workflow\WorkflowManager;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
@@ -19,7 +21,6 @@ use Symfony\Component\Console\Question\Question;
 class Core extends CommandTasksBase
 {
     use CommonCommandTrait;
-    use ExecuteHookTaskTrait;
 
     /**
      * @var string
@@ -31,9 +32,17 @@ class Core extends CommandTasksBase
      *
      * @param \Consolidation\AnnotatedCommand\CommandData $commandData
      */
-    public function corePreCommandHook(CommandData $commandData)
-    {
-        $this->executeHookCollectionTasks($commandData, 'pre');
+    public function corePreCommandHook(
+        CommandData $commandData
+    ): void {
+        $config = PxApp::getConfiguration();
+        $executeTypeManager = PxApp::service('executeTypeManager');
+
+        (new HookExecuteManager(
+            $config,
+            $commandData,
+            $executeTypeManager
+        ))->executeCommands('pre', $this->collectionBuilder());
     }
 
     /**
@@ -44,9 +53,18 @@ class Core extends CommandTasksBase
      *
      * @param \Consolidation\AnnotatedCommand\CommandData $commandData
      */
-    public function corePostCommandHook($result, CommandData $commandData)
-    {
-        $this->executeHookCollectionTasks($commandData, 'post');
+    public function corePostCommandHook(
+        $result,
+        CommandData $commandData
+    ): void {
+        $config = PxApp::getConfiguration();
+        $executeTypeManager = PxApp::service('executeTypeManager');
+
+        (new HookExecuteManager(
+            $config,
+            $commandData,
+            $executeTypeManager
+        ))->executeCommands('post', $this->collectionBuilder());
     }
 
     /**
@@ -136,6 +154,59 @@ class Core extends CommandTasksBase
             ['Temp Directory (Global)', PxApp::globalTempDir()],
             ['Temp Directory (Project)', PxApp::projectTempDir()],
         ]);
+    }
+
+    /**
+     * Execute a specific workflow.
+     *
+     * @param string|null $name
+     *   The name of the workflow.
+     */
+    public function coreWorkflow(string $name = null): void
+    {
+        try {
+            $workflowManager = $this->workflowManager();
+            $workflowOptions = $workflowManager->getWorkflowOptions();
+
+            if (empty($workflowOptions)) {
+                throw new \RuntimeException(
+                    'No workflows have been defined!'
+                );
+            }
+
+            $name = $name ?? $this->askChoice(
+                'Select Workflow to execute',
+                $workflowOptions
+            );
+
+            if (!isset($workflowOptions[$name])) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The workflow name "%s" is invalid!',
+                    $name
+                ));
+            }
+            $status = $this
+                ->workflowManager()
+                ->runWorkflow($name, $this->collectionBuilder());
+
+            if ($successJobs = $status['success'] ?? null) {
+                $this->success(sprintf(
+                    'Successfully ran the following job%s: %s.',
+                    count($successJobs) > 1 ? 's' : '',
+                    implode(', ', $successJobs)
+                ));
+            }
+
+            if ($errorJobs = $status['error'] ?? null) {
+                $this->error(sprintf(
+                    'Issues occurred for the following job%s: %s.',
+                    count($errorJobs) > 1 ? 's' : '',
+                    implode(', ', $errorJobs)
+                ));
+            }
+        } catch (\Exception $exception) {
+            $this->error($exception->getMessage());
+        }
     }
 
     /**
@@ -473,5 +544,16 @@ class Core extends CommandTasksBase
         }
 
         return $projects;
+    }
+
+    /**
+     * Get the workflow manager.
+     *
+     * @return \Pr0jectX\Px\Workflow\WorkflowManager
+     *   The workflow manager instance.
+     */
+    protected function workflowManager(): WorkflowManager
+    {
+        return $this->container->get('workflowManager');
     }
 }

@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Pr0jectX\Px\HookExecuteType;
+namespace Pr0jectX\Px\HookExecute;
 
 use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\Config\ConfigInterface;
+use Pr0jectX\Px\ExecuteType\ExecuteTypeManager;
+use Robo\Collection\CollectionBuilder;
+use Robo\Result;
 
 /**
- * Define the hook execute manager.
+ * Define the hook execute manager class.
  */
 class HookExecuteManager
 {
@@ -28,75 +31,84 @@ class HookExecuteManager
     protected $executeTypes = [];
 
     /**
+     * @var \Pr0jectX\Px\ExecuteType\ExecuteTypeManager
+     */
+    protected $executeTypeManager;
+
+    /**
      * Define the hook execute manager constructor.
      *
      * @param \Consolidation\Config\ConfigInterface $config
      *   The configuration instance.
      * @param \Consolidation\AnnotatedCommand\CommandData $commandData
      *   The command data instance.
+     * @param \Pr0jectX\Px\ExecuteType\ExecuteTypeManager $executeTypeManager
+     *   The execute type manager instance.
      */
     public function __construct(
         ConfigInterface $config,
-        CommandData $commandData
+        CommandData $commandData,
+        ExecuteTypeManager $executeTypeManager
     ) {
         $this->config = $config;
         $this->commandData = $commandData;
+        $this->executeTypeManager = $executeTypeManager;
     }
 
     /**
-     * Run the execute type command.
+     * Execute the hook commands.
      *
-     * @param $hookType
-     *   The hook type that's being invoked.
-     * @return array
+     * @param string $hookType
+     *   The hook type.
+     * @param \Robo\Collection\CollectionBuilder $collection
+     *   The collection builder instance.
+     *
+     * @return \Robo\Result
+     *   The result instance.
      */
-    public function buildCommands(string $hookType): array
-    {
+    public function executeCommands(
+        string $hookType,
+        CollectionBuilder $collection
+    ): Result {
+        $hookConfigs = $this->loadCommandHookConfigs()[$hookType]
+            ?? [];
+
+        return $this->executeTypeManager
+            ->executeInstances(
+                $this->buildCommands($hookConfigs),
+                $collection
+            );
+    }
+
+    /**
+     * Build the execute type command.
+     *
+     * @param array $hookConfigs
+     *   An array of hook configurations.
+     *
+     * @return array|\Pr0jectX\Px\Contracts\ExecuteTypeInterface[]
+     *   An array of execute type commands.
+     */
+    protected function buildCommands(
+        array $hookConfigs
+    ): array {
         $commands = [];
-        $executeTypes = $this->loadExecuteTypes();
-        $hookConfigs = $this->loadCommandHookConfigs()[$hookType] ?? [];
 
         foreach ($hookConfigs as $hookConfig) {
             $hookConfig = is_string($hookConfig)
                 ? ['type' => 'shell', 'command' => $hookConfig]
                 : $hookConfig;
 
-            if (
-                !isset($hookConfig['type'])
-                || !in_array($hookConfig['type'], array_keys($executeTypes))
-            ) {
+            if (!isset($hookConfig['type'])) {
                 continue;
             }
-            /** @var \Pr0jectX\Px\HookExecuteType\ExecuteTypeInterface $instance */
-            $instance = $executeTypes[$hookConfig['type']];
-            $commands[] = $instance->build($hookConfig);
+
+            $commands[] = $this
+                ->executeTypeManager
+                ->createInstance($hookConfig['type'], $hookConfig);
         }
 
         return $commands;
-    }
-
-    /**
-     * Load execute type instances.
-     *
-     * @return array
-     *   An array of execute type instances.
-     */
-    protected function loadExecuteTypes(): array
-    {
-        if (empty($this->executeTypes)) {
-            foreach ($this->registerExecuteTypes() as $classname) {
-                if (
-                    !class_exists($classname)
-                    || !is_subclass_of($classname, ExecuteTypeInterface::class)
-                ) {
-                    continue;
-                }
-                $instance = new $classname();
-                $this->executeTypes[$instance->type()] = $instance;
-            }
-        }
-
-        return $this->executeTypes;
     }
 
     /**
@@ -133,19 +145,5 @@ class HookExecuteManager
     protected function getCommandNameConfigKey(): string
     {
         return implode('.', explode(':', $this->getCommandName()));
-    }
-
-    /**
-     * Registered execute types.
-     *
-     * @return array
-     *   An array of registered execute types.
-     */
-    protected function registerExecuteTypes(): array
-    {
-        return [
-            ExecuteSymfonyType::class,
-            ExecuteShellType::class,
-        ];
     }
 }

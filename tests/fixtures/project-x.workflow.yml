@@ -1,0 +1,21 @@
+workflow:
+    setup-local:
+        label: Setup Local
+        jobs:
+            system:
+                label: System
+                commands:
+                    -
+                        type: shell
+                        command: "echo 'Run system command!';"
+                    -
+                        type: shell
+                        command: "echo 'Run another system command!';"
+            installer:
+                label: Installer
+                commands:
+                    -   type: shell
+                        command: "echo 'Run installer command!';"
+    setup-remote:
+        label: Setup Remote
+        jobs: []
