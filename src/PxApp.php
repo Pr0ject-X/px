@@ -440,7 +440,15 @@ class PxApp extends Application
      */
     public static function composerHasPackage(string $package): bool
     {
-        return isset(static::getProjectComposer()['require'][$package]);
+        $composer = static::getProjectComposer();
+
+        foreach (['require', 'require-dev'] as $section) {
+            if (isset($composer[$section][$package])) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
     }
 
     /**

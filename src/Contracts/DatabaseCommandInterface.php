@@ -17,18 +17,20 @@ interface DatabaseCommandInterface
     /**
      * Import the database file.
      *
-     * @param string $import_file
-     *   The fully qualified database path to the import file.
+     * @param string $importFile
+     *   The database import file.
+     * @param array $opts
+     *   The database import options.
      */
-    public function dbImport(string $import_file);
+    public function dbImport(string $importFile, array $opts = []);
 
     /**
      * Export the database file.
      *
-     * @param string $export_dir
-     *   The export directory.
+     * @param string $exportDir
+     *   The database export directory.
      * @param array $opts
-     *   An array of database export options.
+     *   The database export options.
      */
-    public function dbExport(string $export_dir, array $opts = []);
+    public function dbExport(string $exportDir, array $opts = []);
 }
