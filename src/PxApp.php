@@ -444,11 +444,11 @@ class PxApp extends Application
 
         foreach (['require', 'require-dev'] as $section) {
             if (isset($composer[$section][$package])) {
-                return TRUE;
+                return true;
             }
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
