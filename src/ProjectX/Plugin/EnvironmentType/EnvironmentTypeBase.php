@@ -170,25 +170,6 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function pluginConfiguration(): ConfigTreeBuilder
-    {
-        $envType = PxApp::getEnvironmentType();
-        $envOptions = $this->pluginManager->getOptions();
-        return (new ConfigTreeBuilder())
-            ->setQuestionInput($this->input)
-            ->setQuestionOutput($this->output)
-            ->createNode('type')
-                ->setValue($this->choice(
-                    'Select the environment type',
-                    $envOptions,
-                    $envType
-                ))
-            ->end();
-    }
-
-    /**
      * Select the environment database.
      *
      * @param string $name

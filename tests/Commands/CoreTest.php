@@ -88,13 +88,13 @@ class CoreTest extends TestCaseCommandBase
         $this->cleanTestDirectory();
     }
 
-    public function testCoreSave(): void
+    public function testCoreBookmarkSave(): void
     {
         $projectRoot = PxApp::projectRootPath();
         $globalTempDir = PxApp::globalTempDir();
 
         $commandStatus = (new CommandTester(
-            $this->app->find('core:save')
+            $this->app->find('core:bookmark-save')
         ))->execute([
             'name' => 'Testing'
         ]);
@@ -112,7 +112,7 @@ class CoreTest extends TestCaseCommandBase
         $this->assertEquals($expected, $projectsJsonContents);
     }
 
-    public function testCoreRemove(): void
+    public function testCoreBookmarkRemove(): void
     {
         $projectRoot = PxApp::projectRootPath();
 
@@ -136,7 +136,7 @@ class CoreTest extends TestCaseCommandBase
         ));
 
         $commandStatus = (new CommandTester(
-            $this->app->find('core:remove')
+            $this->app->find('core:bookmark-remove')
         ))->execute([]);
 
         $this->assertEquals(0, $commandStatus);
@@ -174,13 +174,13 @@ class CoreTest extends TestCaseCommandBase
         $this->assertEquals(0, $commandStatus);
     }
 
-    public function testCoreCliShortcut(): void
+    public function testCoreInstallCli(): void
     {
         $this->setApplicationRoot();
         $this->setCommandInputs(['y']);
 
         $command = new CommandTester(
-            $this->app->find('core:cli-shortcut')
+            $this->app->find('core:install-cli')
         );
         $commandStatus = $command->execute([]);
         $userDir = PxApp::userDir();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px\Commands;
 
+use Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder;
+use Pr0jectX\Px\ConfigurationCommandTrait;
 use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Pr0jectX\Px\PxApp;
@@ -128,6 +130,39 @@ class Environment extends CommandTasksBase
     public function envExecute(string $cmd)
     {
         $this->createInstance()->exec($cmd);
+    }
+
+    /**
+     * Set the project environment type to use.
+     */
+    public function envSet()
+    {
+        try {
+            /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
+            $envManager = PxApp::service('environmentTypePluginManager');
+
+            $config = (new ConfigTreeBuilder())
+                ->setQuestionInput($this->input)
+                ->setQuestionOutput($this->output)
+                ->createNode('environment')
+                ->setValue($this->choice(
+                    'Select the environment type',
+                    $envManager->getOptions(),
+                    PxApp::getEnvironmentType()
+                ))
+                ->end();
+
+            $data = $config->build();
+
+            if ($status = $this->writeConfiguration($data)) {
+                $this->success(sprintf(
+                    'Environment type "%s" has been set!',
+                    $data['environment']
+                ));
+            }
+        } catch (\Exception $exception) {
+            $this->error($exception->getMessage());
+        }
     }
 
     /**

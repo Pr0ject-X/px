@@ -210,15 +210,17 @@ class Core extends CommandTasksBase
     }
 
     /**
-     * Save the project location.
+     * Save the project to the bookmark switcher.
      *
      * @param string|null $name
      *   The name of the project.
      * @param array $opts
      * @option $edit
      *   Set if you want to manually edit this file.
+     *
+     * @aliases core:bs
      */
-    public function coreSave(string $name = null, array $opts = ['edit' => false]): void
+    public function coreBookmarkSave(string $name = null, array $opts = ['edit' => false]): void
     {
         if (!isset($opts['edit']) || !$opts['edit']) {
             $name = isset($name) ? $name : $this->askProjectName();
@@ -248,9 +250,11 @@ class Core extends CommandTasksBase
     }
 
     /**
-     * Remove the project location.
+     * Remove the project from the bookmark switcher.
+     *
+     * @aliases core:br
      */
-    public function coreRemove()
+    public function coreBookmarkRemove()
     {
         if ($this->globalProjectExist()) {
             $data = $this->loadGlobalProjectData();
@@ -264,11 +268,11 @@ class Core extends CommandTasksBase
             }
             return;
         }
-        $this->note("The project doesn't exist yet! Use core:save to add the project.");
+        $this->note("The project doesn't exist yet! Use core:bookmark-save to add the project.");
     }
 
     /**
-     * Switch to another saved project directory.
+     * Switch to a project that was bookmarked.
      *
      * @param null $project
      *   The project name.
@@ -320,9 +324,9 @@ class Core extends CommandTasksBase
     }
 
     /**
-     * Add the CLI integration into your shell (e.g .bashrc, .zshrc).
+     * Install the CLI integration into your shell (e.g .bashrc, .zshrc).
      */
-    public function coreCliShortcut(): void
+    public function coreInstallCli(): void
     {
         $userShellRcFile = $this->getUserShellRcFile();
 

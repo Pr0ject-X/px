@@ -12,6 +12,7 @@ use Robo\Tasks;
 abstract class CommandTasksBase extends Tasks
 {
     use IOExtraTrait;
+    use ConfigurationCommandTrait;
 
     /**
      * Find the application command.

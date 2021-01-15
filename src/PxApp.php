@@ -340,7 +340,7 @@ class PxApp extends Application
      */
     public static function activePhpVersions(): array
     {
-        $majorVersion = 7;
+        $versions = [];
 
         $activeVersions = json_decode(
             file_get_contents(
@@ -349,7 +349,14 @@ class PxApp extends Application
             true
         );
 
-        return array_keys($activeVersions[$majorVersion]);
+        foreach ($activeVersions as $activeVersion) {
+            $versions = array_merge(
+                $versions,
+                array_keys($activeVersion)
+            );
+        }
+
+        return $versions;
     }
 
     /**
@@ -379,9 +386,17 @@ class PxApp extends Application
     {
         $configuration = static::getConfiguration();
 
-        return $configuration->has('plugins.environment.type')
-            ? (string) $configuration->get('plugins.environment.type')
-            : 'localhost';
+        if ($configuration->has('environment')) {
+            return $configuration->get('environment');
+        }
+
+        // The plugin environment type has been removed from the directive. It
+        // only needs to be kept as a fallback to support older versions.
+        if ($configuration->has('plugins.environment.type')) {
+            return (string) $configuration->get('plugins.environment.type');
+        }
+
+        return 'localhost';
     }
 
     /**

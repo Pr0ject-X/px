@@ -28,21 +28,8 @@ class ConfigTest extends TestCaseCommandBase
 
         $commandStatus = (new CommandTester(
             $this->app->find('config:set')
-        ))->execute([
-            'name' => 'environment'
-        ]);
+        ))->execute([]);
 
-        $configFile = Yaml::parseFile(
-            'vfs://root/var/www/html/project-x.yml'
-        );
-
-        $expectedConfig = [
-            'environment' => [
-                'type' => 'localhost'
-            ]
-        ];
         $this->assertEquals(0, $commandStatus);
-        $this->assertArrayNotHasKey('options', $configFile);
-        $this->assertEquals($expectedConfig, $configFile['plugins']);
     }
 }

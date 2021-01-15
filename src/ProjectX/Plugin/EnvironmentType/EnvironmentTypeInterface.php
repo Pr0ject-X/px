@@ -15,7 +15,6 @@ use Pr0jectX\Px\State\DatastoreState;
  */
 interface EnvironmentTypeInterface extends
     PluginInterface,
-    PluginConfigurationBuilderInterface,
     PluginCommandRegisterInterface,
     ExecutableBuilderConfigurableInterface
 {

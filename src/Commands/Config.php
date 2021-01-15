@@ -26,19 +26,31 @@ class Config extends CommandTasksBase
     {
         print PxApp::displayBanner();
 
-        if (!isset($name)) {
-            $name = $this->askChoice(
-                'Set plugin configuration for',
-                $this->configOptions()
-            );
-        }
+        try {
+            $options = $this->configOptions();
 
-        if ($config = $this->buildPluginConfiguration($name)) {
-            if ($this->savePluginConfiguration($config)) {
-                $this->success(
-                    sprintf('The %s plugin configuration has successfully been saved.', $name)
+            if (empty($options)) {
+                throw new \RuntimeException(
+                    'There are no plugins to configure.'
                 );
             }
+
+            if (!isset($name)) {
+                $name = $this->askChoice(
+                    'Set plugin configuration for',
+                    $options
+                );
+            }
+
+            if ($config = $this->buildPluginConfiguration($name)) {
+                if ($this->savePluginConfiguration($config)) {
+                    $this->success(
+                        sprintf('The %s plugin configuration has successfully been saved.', $name)
+                    );
+                }
+            }
+        } catch (\Exception $exception) {
+            $this->error($exception->getMessage());
         }
     }
 
@@ -50,12 +62,16 @@ class Config extends CommandTasksBase
      */
     protected function configPluginRouter(): array
     {
-        $router = [
-            'environment' => [
-                'class' => PxApp::getEnvironmentInstance()
-            ],
-        ];
+        $router = [];
+
+        $environmentInstance = PxApp::getEnvironmentInstance();
         $interface = PluginConfigurationBuilderInterface::class;
+
+        if (is_subclass_of($environmentInstance, $interface)) {
+            $router['environment'] = [
+                'class' => PxApp::getEnvironmentInstance()
+            ];
+        }
 
         /** @var \Pr0jectX\Px\PluginManagerInterface $pluginManager */
         $pluginManager = PxApp::service('commandTypePluginManager');
@@ -118,45 +134,16 @@ class Config extends CommandTasksBase
     }
 
     /**
-     * Structure YAML configuration.
+     * Save plugin configuration.
      *
-     * @param array $export
-     *   An array of exported data.
-     *
-     * @return string
-     *   A structured YAML configuration.
-     */
-    protected function structureYmlConfiguration(array $export): string
-    {
-        $cleanedExport = array_filter($export, function ($key) {
-            return !in_array($key, ['options']);
-        }, ARRAY_FILTER_USE_KEY);
-
-        return Yaml::dump($cleanedExport, 10, 4);
-    }
-
-    /**
-     * Save the plugin configurations.
-     *
-     * @param array $configurations
-     *   An array of the plugin configurations.
+     * @param array $plugins
+     *   An array of the plugin configuration.
      *
      * @return bool
-     *   Return true if the configurations were saved; otherwise false.
+     *   Return true if the plugin configuration were saved; otherwise false.
      */
-    protected function savePluginConfiguration(array $configurations): bool
+    protected function savePluginConfiguration(array $plugins): bool
     {
-        $projectRoot = PxApp::projectRootPath();
-        $configFilename = PxApp::CONFIG_FILENAME;
-
-        $configExport = PxApp::getConfiguration()
-            ->set('plugins', $configurations)
-            ->export();
-
-        $results = $this->taskWriteToFile("{$projectRoot}/{$configFilename}.yml")
-            ->text($this->structureYmlConfiguration($configExport))
-            ->run();
-
-        return $results->wasSuccessful();
+        return $this->writeConfiguration(['plugins' => $plugins]);
     }
 }
