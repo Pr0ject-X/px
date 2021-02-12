@@ -45,6 +45,12 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
                 'Set the deployment git repository URL.'
             ),
             new InputOption(
+                'git-args',
+                null,
+                InputOPtion::VALUE_REQUIRED,
+                'Set the deployment git arguments.'
+            ),
+            new InputOption(
                 'origin',
                 'o',
                 InputOption::VALUE_REQUIRED,
@@ -126,6 +132,42 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     }
 
     /**
+     * Get the git argument options.
+     *
+     * @return array
+     *   An array of the git arguments.
+     */
+    protected function getGitArguments(): array
+    {
+        $options = $this->getOptions();
+
+        if (!isset($options['git-args'])) {
+            return [];
+        }
+
+        return array_map(
+            'trim',
+            explode(' ', $options['git-args'])
+        );
+    }
+
+    /**
+     * Get the git push command arguments.
+     *
+     * @return stirng
+     *   A string of git command arguments.
+     */
+    protected function getGitPushArguments(): string
+    {
+        return implode(' ', array_unique(
+            array_merge([
+                '-u',
+                '--tags'
+            ], $this->getGitArguments())
+        ));
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function deploy()
@@ -157,7 +199,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
             $commitTask->run();
 
             $this->getGitBuildStack()
-                ->exec("push -u --tags {$this->getOrigin()} {$this->getBranch()}")
+                ->exec("push {$this->getGitPushArguments()} {$this->getOrigin()} {$this->getBranch()}")
                 ->run();
         } else {
             $this->say("Deploy build hasn't changed.");
