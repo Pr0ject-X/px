@@ -45,10 +45,16 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
                 'Set the deployment git repository URL.'
             ),
             new InputOption(
-                'git-args',
+                'git-push-args',
                 null,
-                InputOPtion::VALUE_REQUIRED,
-                'Set the deployment git arguments.'
+                InputOption::VALUE_REQUIRED,
+                'Set the deployment git push arguments.'
+            ),
+            new InputOption(
+                'git-commit-args',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Set the deployment git commit arguments.'
             ),
             new InputOption(
                 'origin',
@@ -132,22 +138,42 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
     }
 
     /**
-     * Get the git argument options.
+     * Get the git push command argument options.
      *
      * @return array
-     *   An array of the git arguments.
+     *   An array of the git push arguments.
      */
-    protected function getGitArguments(): array
+    protected function getGitPushArgumentOptions(): array
     {
         $options = $this->getOptions();
 
-        if (!isset($options['git-args'])) {
+        if (!isset($options['git-push-args'])) {
             return [];
         }
 
         return array_map(
             'trim',
-            explode(' ', $options['git-args'])
+            explode(' ', $options['git-push-args'])
+        );
+    }
+
+    /**
+     * Get the git commit command argument options.
+     *
+     * @return array
+     *   An array of the git commit arguments.
+     */
+    protected function getGitCommitArgumentOptions(): array
+    {
+        $options = $this->getOptions();
+
+        if (!isset($options['git-commit-args'])) {
+            return [];
+        }
+
+        return array_map(
+            'trim',
+            explode(' ', $options['git-commit-args'])
         );
     }
 
@@ -163,7 +189,7 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
             array_merge([
                 '-u',
                 '--tags'
-            ], $this->getGitArguments())
+            ], $this->getGitPushArgumentOptions())
         ));
     }
 
@@ -176,25 +202,28 @@ class GitDeployType extends DeployTypeBase implements GitDeployTypeInterface
 
         if ($this->hasTrackedFilesChanged()) {
             $commitTask = $this->getGitBuildStack();
+            $commitArgs = implode(' ', $this->getGitCommitArgumentOptions());
 
-            if (!$this->noBuildVersion()) {
+            if ($this->noBuildVersion()) {
+                $commitDate = date('m-d-Y \a\t g:ia');
+                $commitTask->commit("Build commit on {$commitDate}", $commitArgs);
+            } else {
                 $buildVersion = $this->buildSemanticVersion(
                     $this->latestBuildVersion()
                 );
 
-                if ($this->getBuildVersioningMethod() === 'file') {
-                    if ($this->updateBuildVersionFile($buildVersion)) {
-                        $commitTask->add($this->getBuildVersionFile());
-                    }
+                if (
+                    ($this->getBuildVersioningMethod() === 'file')
+                    && $this->updateBuildVersionFile($buildVersion)
+                ) {
+                    $commitTask->add($this->getBuildVersionFile());
                 }
-                $commitTask->commit("Build commit for {$buildVersion}.");
+
+                $commitTask->commit("Build commit for {$buildVersion}.", $commitArgs);
 
                 if ($this->getBuildVersioningMethod() === 'tag') {
                     $commitTask->tag($buildVersion);
                 }
-            } else {
-                $commitDate = date('m-d-Y \a\t g:ia');
-                $commitTask->commit("Build commit on {$commitDate}");
             }
             $commitTask->run();
 
