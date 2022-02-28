@@ -26,6 +26,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpClient\HttpClient;
 
 /**
  * Define the project-x console application.
@@ -191,6 +192,10 @@ class PxApp extends Application
             );
 
             Robo::configureContainer($container, $app, $config, $input, $output, $classLoader);
+
+            $container->add('httpClient', function () {
+                return HttpClient::create();
+            });
 
             $container->share('workflowManager', WorkflowManager::class)
                 ->withArguments([
@@ -387,7 +392,7 @@ class PxApp extends Application
         $configuration = static::getConfiguration();
 
         if ($configuration->has('environment')) {
-            return $configuration->get('environment');
+            return (string) $configuration->get('environment');
         }
 
         // The plugin environment type has been removed from the directive. It
@@ -402,16 +407,18 @@ class PxApp extends Application
     /**
      * The project environment instance.
      *
-     * @param array $config
-     *   An array of configurations to pass along to the instance.
+     * @param array $defaultConfig
+     *   An array of default configurations.
      *
      * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
      */
-    public static function getEnvironmentInstance(array $config = []): EnvironmentTypeInterface
+    public static function getEnvironmentInstance(array $defaultConfig = []): EnvironmentTypeInterface
     {
         if (!isset(static::$projectEnvironment)) {
             /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
             $envManager = static::service('environmentTypePluginManager');
+            $config = static::getConfiguration()
+                ->get('plugins.environment', $defaultConfig);
 
             static::$projectEnvironment = $envManager->createInstance(
                 static::getEnvironmentType(),

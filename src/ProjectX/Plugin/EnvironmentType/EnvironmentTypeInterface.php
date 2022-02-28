@@ -6,7 +6,6 @@ namespace Pr0jectX\Px\ProjectX\Plugin\EnvironmentType;
 
 use Pr0jectX\Px\Contracts\ExecutableBuilderConfigurableInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginCommandRegisterInterface;
-use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Pr0jectX\Px\State\DatastoreState;
 
@@ -99,8 +98,10 @@ interface EnvironmentTypeInterface extends
      *
      * @param string $cmd
      *   The command to execute.
+     * @param array $opts
+     *   An array of execute options.
      */
-    public function exec(string $cmd);
+    public function exec(string $cmd, array $opts = []);
 
     /**
      * Launch the environment application.
@@ -168,8 +169,8 @@ interface EnvironmentTypeInterface extends
     /**
      * Define the environment databases.
      *
-     * @return array
-     *   An array of \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase keyed by name.
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase[]
+     *   An array of environment databases.
      */
     public function envDatabases(): array;
 

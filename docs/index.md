@@ -1,10 +1,9 @@
 
-## Core Architecture
+Project-X was developed as a plugable CLI utility which can streamline redundant tasks for a variety of projects. This includes local or remote setup, CI integration along with artifact builds and deployments, and much more. The core foundation of Project-X was built using the [Robo](https://robo.li/) framework, which provided a solid foundation.
 
-Project-X was created as a plugable CLI application that can be used to streamline redundant tasks for a given project. Due to this type of architecture there are only a few commands that are provided by the main application; so it can remain as lean as possible. Most commands will be loaded from a third-party plugins which will need to be required per project.
+With a plugable architecture in place we heavily rely on third-party plugins provided by the community to build most of the integrations that we use in our daily routines. There are a limited amount of features provided in the core utility. Which allows the project to remain as slim as possible, so it scales based solely on the projects requirements.
 
-## Install CLI Shortcut
+## Community
 
-It can be quite redundant invoking the `vendor/droath/px` executable from the vendor directory. The recommended method would be to run the `vendor/droath/px core:cli-shortcut` command. Which will create an `px` function in the users default shell (bash, zsh) RC file.
+It's really easy to get involved in the Project-X community. Developing third-party integrations can be as easy as adding a 100 lines of code in a plugin, which can be shared with other developers in the community so that we all can become more proficient in our daily routines. Please head over to the [Extending Section]() if you would like to get more involved with developing.
 
-Then you can run the `px` command within the project root directory, and will no longer need to supply the full vendor path. This only needs to be executed once and all projects will be able to benefit from it.

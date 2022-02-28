@@ -1,6 +1,6 @@
 {
     "name": "pr0ject-x/px",
-    "description": "Project-X is a plugable tool for developers, it streamlines redundant tasks without hassle.",
+    "description": "Project-X is a pluggable toolkit which can streamline redundant tasks without hassle.",
     "type": "library",
     "license": "MIT",
     "prefer-stable": true,
@@ -22,6 +22,7 @@
         "symfony/config": "^3.0|^4.0",
         "symfony/finder": "^3.0|^4.0",
         "symfony/console": "^3.0|^4.0",
+        "symfony/http-client": "^5.4",
         "knplabs/packagist-api": "^1.5",
         "danielstjules/stringy": "^3.1"
     },

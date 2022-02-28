@@ -14,14 +14,6 @@ class LocalhostEnvironmentType extends EnvironmentTypeBase
     /**
      * @inheritDoc
      */
-    public function envAppRoot(): string
-    {
-        return PxApp::projectRootPath();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public static function pluginId(): string
     {
         return 'localhost';
@@ -33,5 +25,21 @@ class LocalhostEnvironmentType extends EnvironmentTypeBase
     public static function pluginLabel(): string
     {
         return 'Localhost';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function envAppRoot(): string
+    {
+        return PxApp::projectRootPath();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function envDatabases(): array
+    {
+        return [];
     }
 }

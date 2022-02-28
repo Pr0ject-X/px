@@ -27,10 +27,6 @@ trait PluginConfigurationTrait
             : $class::pluginId();
         $pluginConfiguration = PxApp::getConfiguration()->get('plugins');
 
-        if (!isset($pluginConfiguration[$pluginId])) {
-            return [];
-        }
-
-        return $pluginConfiguration[$pluginId];
+        return $pluginConfiguration[$pluginId] ?? [];
     }
 }

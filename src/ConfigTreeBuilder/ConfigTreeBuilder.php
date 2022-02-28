@@ -14,7 +14,6 @@ use Symfony\Component\Console\Question\Question;
  */
 class ConfigTreeBuilder
 {
-
     /**
      * @var array
      */
@@ -78,7 +77,17 @@ class ConfigTreeBuilder
     }
 
     /**
-     * Set the configure tree node.
+     * Check if the tree is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->tree);
+    }
+
+    /**
+     * Set the configuration tree node.
      *
      * @param string $name
      *   The node name.
@@ -93,7 +102,7 @@ class ConfigTreeBuilder
             $this->tree[$name] = new ConfigNode($this);
         } elseif ($this->immutable) {
             throw new \Exception(
-                "Unable to override as the config tree is immutable."
+                'Unable to override as the config tree is immutable.'
             );
         }
 
@@ -114,13 +123,12 @@ class ConfigTreeBuilder
             if (!$this->hasConditionPassed($node, [$build])) {
                 continue;
             }
+            $prevBuild = $build;
             $build[$name] = [];
 
-            $this->processNodeValues($node->getValue(), $build[$name]);
+            $this->processNodeValues($node->getValue(), $name, $build[$name], $prevBuild);
 
-            if (!$node->hasMultipleValues() && !$node->hasNodeArrayValue()) {
-                $build[$name] = reset($build[$name]);
-            }
+            $build[$name] = $this->formatNodeBuildValue($node, $build[$name]);
         }
 
         return $build;
@@ -131,14 +139,21 @@ class ConfigTreeBuilder
      *
      * @param array $values
      *   An array of values to iterate over.
+     * @param string $name
+     *   A node property name.
      * @param array $data
      *   An array of the current node values.
+     * @param array $previousData
+     *   An array of previous node values data.
      */
-    protected function processNodeValues(array $values, &$data = [])
+    protected function processNodeValues(array $values, string $name, array &$data = [], array $previousData = []): void
     {
         foreach ($values as $index => $value) {
             if ($value instanceof ConfigNodeArray) {
-                $this->processNodeValues($value->getValue(), $data[$index]);
+                if (!isset($data[$index])) {
+                    $data[$index] = [];
+                }
+                $this->processNodeValues($value->getValue(), $name, $data[$index]);
             } else {
                 if (is_scalar($value)) {
                     $data[$index] = $value;
@@ -151,17 +166,47 @@ class ConfigTreeBuilder
                     );
                 }
                 if (is_callable($value)) {
-                    $data[$index] = call_user_func_array($value, [$values]);
+                    $data[$index] = $value(
+                        array_merge_recursive($previousData, [$name => $data])
+                    );
                 }
             }
         }
     }
 
     /**
+     * Format the node build value output.
+     *
+     * @param \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode $node
+     *   The configuration node.
+     * @param array $value
+     *   The node array value.
+     *
+     * @return mixed
+     *   The formatted build values.
+     */
+    protected function formatNodeBuildValue(ConfigNode $node, array $value)
+    {
+        if (!$node->hasMultipleValues() && !$node->hasNodeArrayValue()) {
+            return reset($value);
+        }
+
+        if ($node->hasNodeArrayValue() && $node->countNodeArrayValue() === 1) {
+            $nodeArray = $node->getValue()[0];
+
+            if ($nodeArray instanceof ConfigNodeArray && $nodeArray->hasSingleValue()) {
+                return reset($value);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * Has config node condition passed.
      *
      * @param \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode $node
-     *   The configure node object.
+     *   A configuration node object.
      * @param array $args
      *   An array of arguments to pass to the condition
      * @param bool $mustPassAll
@@ -186,7 +231,7 @@ class ConfigTreeBuilder
 
         if ($verdict = array_unique($verdict)) {
             if (count($verdict) === 1) {
-                return (bool) reset($verdict);
+                return reset($verdict);
             }
 
             if ($mustPassAll !== true) {

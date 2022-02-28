@@ -7,7 +7,6 @@ namespace Pr0jectX\Px\Commands;
 use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\ProjectX\Plugin\PluginConfigurationBuilderInterface;
 use Pr0jectX\Px\PxApp;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Define the configuration command.
@@ -17,14 +16,19 @@ class Config extends CommandTasksBase
     /**
      * Set the project plugin configuration.
      *
-     * @param $name
+     * @param null $name
      *   The plugin configuration name.
-     *
-     * @throws \Exception
+     * @param array $opts
+     * @option bool $hide-banner
+     *   Hide banner from display.
      */
-    public function configSet($name = null)
+    public function configSet($name = null, array $opts = [
+        'hide-banner' => false
+    ]): void
     {
-        print PxApp::displayBanner();
+        if (isset($opts['hide-banner']) && !$opts['hide-banner']) {
+            print PxApp::displayBanner();
+        }
 
         try {
             $options = $this->configOptions();
@@ -63,13 +67,21 @@ class Config extends CommandTasksBase
     protected function configPluginRouter(): array
     {
         $router = [];
-
-        $environmentInstance = PxApp::getEnvironmentInstance();
+        $config = PxApp::getConfiguration();
         $interface = PluginConfigurationBuilderInterface::class;
+
+        /** @var \Pr0jectX\Px\PluginManagerInterface $environmentManager */
+        $environmentManager = PxApp::service('environmentTypePluginManager');
+        $environmentConfigs = $config->get('plugins.environment', []);
+
+        $environmentInstance = $environmentManager->createInstance(
+            PxApp::getEnvironmentType(),
+            $environmentConfigs
+        );
 
         if (is_subclass_of($environmentInstance, $interface)) {
             $router['environment'] = [
-                'class' => PxApp::getEnvironmentInstance()
+                'class' => $environmentInstance
             ];
         }
 

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Pr0jectX\Px\Commands;
 
 use Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder;
-use Pr0jectX\Px\ConfigurationCommandTrait;
 use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
-use Pr0jectX\Px\ProjectX\Plugin\PluginInterface;
 use Pr0jectX\Px\PxApp;
 use Pr0jectX\Px\CommandTasksBase;
 
@@ -19,7 +17,7 @@ class Environment extends CommandTasksBase
     /**
      * Initialize the project environment.
      */
-    public function envInit()
+    public function envInit(): void
     {
         $this->createInstance()->init();
     }
@@ -29,7 +27,7 @@ class Environment extends CommandTasksBase
      *
      * @aliases env:info
      */
-    public function envStatus()
+    public function envStatus(): void
     {
         $this->createInstance()->info();
     }
@@ -39,7 +37,7 @@ class Environment extends CommandTasksBase
      *
      * @aliases env:up
      */
-    public function envStart()
+    public function envStart(): void
     {
         $this->createInstance()->start();
     }
@@ -47,7 +45,7 @@ class Environment extends CommandTasksBase
     /**
      * @hook post-command env:start
      */
-    public function postEnvStart()
+    public function postEnvStart(): void
     {
         if ($this->confirm('Launch the environment?', true)) {
             /** @var \Symfony\Component\Console\Application $applicaiton */
@@ -68,7 +66,7 @@ class Environment extends CommandTasksBase
      *
      * @aliases env:down, env:halt
      */
-    public function envStop()
+    public function envStop(): void
     {
         $this->createInstance()->stop();
     }
@@ -76,7 +74,7 @@ class Environment extends CommandTasksBase
     /**
      * @hook post-command env:stop
      */
-    public function postEnvStop()
+    public function postEnvStop(): void
     {
         $this->createInstance()->setStatus(
             EnvironmentTypeInterface::ENVIRONMENT_STATUS_STOPPED
@@ -86,7 +84,7 @@ class Environment extends CommandTasksBase
     /**
      * Restart the project environment.
      */
-    public function envRestart()
+    public function envRestart(): void
     {
         $this->createInstance()->restart();
     }
@@ -94,7 +92,7 @@ class Environment extends CommandTasksBase
     /**
      * Destroy the project environment.
      */
-    public function envDestroy()
+    public function envDestroy(): void
     {
         $this->createInstance()->destroy();
     }
@@ -116,7 +114,7 @@ class Environment extends CommandTasksBase
      * @option $schema
      *   The URL protocol to use.
      */
-    public function envLaunch(array $opts = ['schema' => null])
+    public function envLaunch(array $opts = ['schema' => null]): void
     {
         $this->createInstance()->launch($opts);
     }
@@ -126,16 +124,23 @@ class Environment extends CommandTasksBase
      *
      * @param string $cmd
      *   The command to execute.
+     * @param array $opts
+     *   An array of command options.
+     *
+     * @option $silent
+     *   Set if command output should be silent.
      */
-    public function envExecute(string $cmd)
+    public function envExecute(string $cmd, $opts = [
+        'silent' => false,
+    ]): void
     {
-        $this->createInstance()->exec($cmd);
+        $this->createInstance()->exec($cmd, $opts);
     }
 
     /**
      * Set the project environment type to use.
      */
-    public function envSet()
+    public function envSet(): void
     {
         try {
             /** @var \Pr0jectX\Px\PluginManagerInterface $envManager */
@@ -154,7 +159,7 @@ class Environment extends CommandTasksBase
 
             $data = $config->build();
 
-            if ($status = $this->writeConfiguration($data)) {
+            if ($this->writeConfiguration($data)) {
                 $this->success(sprintf(
                     'Environment type "%s" has been set!',
                     $data['environment']
@@ -171,10 +176,10 @@ class Environment extends CommandTasksBase
      * @param array $config
      *   An array of env configurations.
      *
-     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
+     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
      *   The environment plugin instance.
      */
-    protected function createInstance(array $config = []): PluginInterface
+    protected function createInstance(array $config = []): EnvironmentTypeInterface
     {
         return Pxapp::getEnvironmentInstance($config);
     }

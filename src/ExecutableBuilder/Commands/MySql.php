@@ -68,4 +68,18 @@ class MySql extends ExecutableBuilderBase
 
         return $this;
     }
+
+    /**
+     * Set the MySql execute command.
+     *
+     * @param string $command
+     *
+     * @return \Pr0jectX\Px\ExecutableBuilder\Commands\MySql
+     */
+    public function execute(string $command): MySql
+    {
+        $this->setOption(__FUNCTION__, $command);
+
+        return $this;
+    }
 }

@@ -23,6 +23,9 @@ class ExecuteSymfonyType extends ExecuteTypeBase
         $taskInstance = (new SymfonyCommand($command));
 
         foreach ($this->getArguments() as $argument) {
+            if (!is_array($argument)) {
+                continue;
+            }
             foreach ($argument as $name => $value) {
                 $taskInstance->arg($name, $value);
             }

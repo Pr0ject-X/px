@@ -2,8 +2,10 @@ site_name: Project-X
 theme: readthedocs
 nav:
     - Overview: index.md
-    - Commands:
+    - Getting Started:
+        - Drupal: GettingStarted/drupal.md
+    - Main Commands:
         - Core: Commands/core.md
         - Artifact: Commands/artifact.md
     - Extending:
-          - Deploy Type: Extending/deploy-type.md
+        - Deploy Type: Extending/deploy-type.md

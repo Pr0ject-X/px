@@ -57,11 +57,13 @@ class ConfigNode
     /**
      * Set the configuration node array.
      *
+     * @param bool $singleValue
+     *
      * @return \Pr0jectX\Px\ConfigTreeBuilder\ConfigNodeArray
      */
-    public function setArray(): ConfigNodeArray
+    public function setArray(bool $singleValue = false): ConfigNodeArray
     {
-        $array = new ConfigNodeArray($this);
+        $array = new ConfigNodeArray($this, $singleValue);
 
         $this->nodeValue[] = $array;
 
@@ -116,6 +118,17 @@ class ConfigNode
     }
 
     /**
+     * The tree node array value count.
+     *
+     * @return int
+     *   The node array count value.
+     */
+    public function countNodeArrayValue(): int
+    {
+        return count($this->nodeValue);
+    }
+
+    /**
      * The tree node has an array value.
      *
      * @return bool
@@ -133,7 +146,7 @@ class ConfigNode
      */
     public function hasMultipleValues(): bool
     {
-        return count($this->nodeValue) > 1;
+        return $this->countNodeArrayValue() > 1;
     }
 
     /**

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pr0jectX\Px\ProjectX\Plugin\EnvironmentType;
 
 use Pr0jectX\Px\Commands\Environment;
-use Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder;
 use Pr0jectX\Px\Datastore\JsonDatastore;
 use Pr0jectX\Px\Exception\EnvironmentMethodNotSupported;
 use Pr0jectX\Px\ProjectX\Plugin\PluginTasksBase;
@@ -68,7 +67,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function exec(string $cmd)
+    public function exec(string $cmd, array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
     }
@@ -92,7 +91,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function envPackages(): array
+    public function envDatabases(): array
     {
         return [];
     }
@@ -100,7 +99,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function envDatabases(): array
+    public function envPackages(): array
     {
         return [];
     }
@@ -128,7 +127,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
      */
     public function getStatus(): string
     {
-        return (string) $this->getState()->get('status') ?? 'unknown';
+        return (string) ($this->getState()->get('status') ?? 'unknown');
     }
 
     /**

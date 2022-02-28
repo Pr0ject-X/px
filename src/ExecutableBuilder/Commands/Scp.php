@@ -56,21 +56,68 @@ class Scp extends ExecutableBuilderBase
     }
 
     /**
+     * Set the scp port.
+     *
+     * @param int $port
+     *   The ssh port value.
+     *
+     * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
+     */
+    public function port(int $port): Scp
+    {
+        $this->setOption('-P', $port);
+
+        return $this;
+    }
+
+    /**
      * Set the scp identify file path.
      *
-     * @param string $identify_file
+     * @param string $identifyFile
      *   The path to the ssh identify file.
      *
      * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
      */
-    public function identityFile(string $identify_file): Scp
+    public function identityFile(string $identifyFile): Scp
     {
-        if (!file_exists($identify_file)) {
+        if (!file_exists($identifyFile)) {
             throw new \RuntimeException(
-                sprintf('Unable to locate the SSH identify file %s', $identify_file)
+                sprintf('Unable to locate the SSH identify file %s', $identifyFile)
             );
         }
-        $this->setOption('-i', $identify_file);
+        $this->setOption('-i', $identifyFile);
+
+        return $this;
+    }
+
+    /**
+     * Set the scp identities only option.
+     *
+     * @param bool $value
+     *   Set value to TRUE if identities should only used, otherwise FALSE.
+     *
+     * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
+     */
+    public function identitiesOnly(bool $value): Scp
+    {
+        $value = $value ? 'yes' : 'no';
+        $this->setOption('-o', "IdentitiesOnly={$value}");
+
+        return $this;
+    }
+
+    /**
+     * Set the scp strict host key checking option.
+     *
+     * @param bool $value
+     *   Set value to TRUE if identities should only used, otherwise FALSE.
+     *
+     * @return \Pr0jectX\Px\ExecutableBuilder\Commands\Scp
+     */
+    public function strictHostKeyChecking(bool $value): self
+    {
+        $value = $value ? 'yes' : 'no';
+        $this->setOption('-o', "StrictHostKeyChecking={$value}");
 
         return $this;
     }

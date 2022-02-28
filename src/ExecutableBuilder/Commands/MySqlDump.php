@@ -10,4 +10,16 @@ namespace Pr0jectX\Px\ExecutableBuilder\Commands;
 class MySqlDump extends MySql
 {
     protected const EXECUTABLE = 'mysqldump';
+
+    /**
+     * Set MySqlDump no tablespaces option.
+     *
+     * @return $this
+     */
+    public function noTablespaces(): self
+    {
+        $this->setOption('no-tablespaces');
+
+        return $this;
+    }
 }

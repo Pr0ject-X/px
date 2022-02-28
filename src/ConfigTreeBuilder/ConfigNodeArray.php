@@ -20,13 +20,33 @@ class ConfigNodeArray
     protected $configNode;
 
     /**
+     * @var bool
+     */
+    protected $singleValue = false;
+
+    /**
      * Config node array constructor.
      *
      * @param \Pr0jectX\Px\ConfigTreeBuilder\ConfigNode $node
+     *   The config node object.
+     * @param bool $singleValue
+     *   Set the node a single array value.
      */
-    public function __construct(ConfigNode $node)
+    public function __construct(ConfigNode $node, bool $singleValue = false)
     {
         $this->configNode = $node;
+        $this->singleValue = $singleValue;
+    }
+
+    /**
+     * Determine if the value was set as a single.
+     *
+     * @return bool
+     *   Return true if it's a single value; otherwise false.
+     */
+    public function hasSingleValue(): bool
+    {
+        return $this->singleValue;
     }
 
     /**
