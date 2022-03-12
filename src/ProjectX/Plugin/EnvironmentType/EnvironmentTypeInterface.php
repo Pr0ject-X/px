@@ -46,6 +46,14 @@ interface EnvironmentTypeInterface extends
     public function init(array $opts = []);
 
     /**
+     * Install the environment prerequisites.
+     *
+     * @param array $opts
+     *   An array of start options.
+     */
+    public function install(array $opts = []);
+
+    /**
      * Start the environment.
      *
      * @param array $opts

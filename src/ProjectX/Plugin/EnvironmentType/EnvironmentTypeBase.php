@@ -27,6 +27,14 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
+    public function install(array $opts = [])
+    {
+        throw new EnvironmentMethodNotSupported($this, __FUNCTION__);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function start(array $opts = [])
     {
         throw new EnvironmentMethodNotSupported($this, __FUNCTION__);

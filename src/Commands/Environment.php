@@ -23,6 +23,14 @@ class Environment extends CommandTasksBase
     }
 
     /**
+     * Install the environment prerequisites.
+     */
+    public function envInstall(): void
+    {
+        $this->createInstance()->install();
+    }
+
+    /**
      * Display project environment status.
      *
      * @aliases env:info
