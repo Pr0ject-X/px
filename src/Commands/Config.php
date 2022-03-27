@@ -124,22 +124,21 @@ class Config extends CommandTasksBase
      * @return array
      *   An array of the build configuration.
      *
-     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     protected function buildPluginConfiguration($name): array
     {
         $config = [];
 
-        if (isset($this->configPluginRouter()[$name])) {
-            $pluginInstance = $this->configPluginRouter()[$name]['class'];
-
-            if ($pluginInstance instanceof PluginConfigurationBuilderInterface) {
-                $config[$name] = $pluginInstance->pluginConfiguration()->build();
-            }
-        } else {
-            throw new \RuntimeException(
+        if (!isset($this->configPluginRouter()[$name])) {
+            throw new \InvalidArgumentException(
                 sprintf('The configuration key "%s" is invalid!', $name)
             );
+        }
+        $pluginInstance = $this->configPluginRouter()[$name]['class'];
+
+        if ($pluginInstance instanceof PluginConfigurationBuilderInterface) {
+            $config[$name] = $pluginInstance->pluginConfiguration()->build();
         }
 
         return $config;

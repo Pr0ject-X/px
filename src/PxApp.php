@@ -474,6 +474,33 @@ class PxApp extends Application
     }
 
     /**
+     * Load project-x related templates.
+     *
+     * @param string $filename
+     *   The template filename.
+     * @param array $directories
+     *   An array of directories to append.
+     *
+     * @return string|null
+     *   The template file contents.
+     */
+    public static function loadTemplate(
+        string $filename,
+        array $directories = []
+    ): ?string {
+        $filepath = implode(DIRECTORY_SEPARATOR, array_merge([
+            APPLICATION_ROOT,
+            'templates'
+        ], $directories, [$filename]));
+
+        if (!file_exists($filepath)) {
+            return null;
+        }
+
+        return file_get_contents($filepath);
+    }
+
+    /**
      * Execute the project-x console application.
      *
      * @return int
@@ -553,7 +580,7 @@ class PxApp extends Application
 
         $classes = array_merge(
             $classes,
-            static::discoverPluginCommandClasses($environment)
+            static::resolvePluginCommandClasses($environment)
         );
 
         foreach (['commandTypePluginManager'] as $id) {
@@ -566,7 +593,7 @@ class PxApp extends Application
     }
 
     /**
-     * Get the instantiated plugin command instance.
+     * Create the plugin command instance.
      *
      * @param \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin
      *   The plugin instance.
@@ -575,19 +602,34 @@ class PxApp extends Application
      *
      * @return \Pr0jectX\Px\CommandTasksBase
      */
-    protected static function pluginCommandFactory(
+    protected static function createPluginCommandInstance(
         PluginInterface $plugin,
         string $classname
     ): CommandTasksBase {
-        if (is_subclass_of($classname, PluginCommandTaskBase::class)) {
-            return new $classname($plugin);
+        $instance = is_subclass_of($classname, PluginCommandTaskBase::class)
+            ? new $classname($plugin)
+            : new $classname();
+
+        if ($instance instanceof IOAwareInterface) {
+            $instance->setInput(PxApp::service('input'));
+            $instance->setOutput(PxApp::service('output'));
         }
 
-        return new $classname();
+        if ($instance instanceof ContainerAwareInterface) {
+            $instance->setContainer(PxApp::getContainer());
+        }
+
+        if ($instance instanceof BuilderAwareInterface) {
+            $instance->setBuilder(
+                CollectionBuilder::create(PxApp::getContainer(), $instance)
+            );
+        }
+
+        return $instance;
     }
 
     /**
-     * Discover plugin instance registered command classes.
+     * Resolve plugin instance registered command classes.
      *
      * @param \Pr0jectX\Px\ProjectX\Plugin\PluginInterface $plugin
      *   The plugin instance.
@@ -595,7 +637,7 @@ class PxApp extends Application
      * @return array
      *   An array of registered command commands for the plugin instance.
      */
-    protected static function discoverPluginCommandClasses(
+    protected static function resolvePluginCommandClasses(
         PluginInterface $plugin
     ): array {
         $classes = [];
@@ -608,24 +650,7 @@ class PxApp extends Application
                 ) {
                     continue;
                 }
-                $instance = static::pluginCommandFactory($plugin, $command);
-
-                if ($instance instanceof IOAwareInterface) {
-                    $instance->setInput(PxApp::service('input'));
-                    $instance->setOutput(PxApp::service('output'));
-                }
-                $container = PxApp::getContainer();
-
-                if ($instance instanceof ContainerAwareInterface) {
-                    $instance->setContainer($container);
-                }
-
-                if ($instance instanceof BuilderAwareInterface) {
-                    $instance->setBuilder(
-                        CollectionBuilder::create($container, $instance)
-                    );
-                }
-                $classes[] = $instance;
+                $classes[] = static::createPluginCommandInstance($plugin, $command);
             }
         }
 
@@ -649,7 +674,7 @@ class PxApp extends Application
         $configurations = PxApp::getConfiguration()->get('plugins') ?? [];
 
         foreach ($plugin_manager->loadInstancesWithInterface($interface, $configurations) as $pluginInstance) {
-            $commands[] = static::discoverPluginCommandClasses($pluginInstance);
+            $commands[] = static::resolvePluginCommandClasses($pluginInstance);
         }
 
         return $commands;

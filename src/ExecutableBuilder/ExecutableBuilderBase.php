@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px\ExecutableBuilder;
 
+use Pr0jectX\Px\PxApp;
+
 /**
  * Define the executable builder base class.
  */
@@ -128,6 +130,17 @@ abstract class ExecutableBuilderBase
     }
 
     /**
+     * Build the executable command string.
+     *
+     * @return string
+     *   A fully executable command to run within a local or remote environment.
+     */
+    public function build(): string
+    {
+        return trim(implode(' ', $this->executableStructure()));
+    }
+
+    /**
      * Get all configuration options.
      *
      * @return array|\string[]
@@ -201,6 +214,24 @@ abstract class ExecutableBuilderBase
     }
 
     /**
+     * Resolve the executable path.
+     *
+     * @return string
+     *   The relative path to the executable; otherwise defaults to system.
+     */
+    protected function resolveExecutable(): string
+    {
+        $executable = strtolower(static::EXECUTABLE);
+        $composerBin = PxApp::getProjectComposer()['bin'] ?? 'vendor/bin';
+
+        if (file_exists(PxApp::projectRootPath() . "/$composerBin/$executable")) {
+            return "$composerBin/$executable";
+        }
+
+        return $executable;
+    }
+
+    /**
      * Define the command structure.
      *
      * @return array
@@ -208,20 +239,10 @@ abstract class ExecutableBuilderBase
     protected function executableStructure(): array
     {
         return [
-            static::EXECUTABLE,
+            $this->resolveExecutable(),
             $this->flattenOptions(),
             $this->flattenArguments()
         ];
     }
 
-    /**
-     * Build the executable command string.
-     *
-     * @return string
-     *   An fully executable command to run within a local or remote environment.
-     */
-    public function build(): string
-    {
-        return trim(implode(' ', $this->executableStructure()));
-    }
 }
