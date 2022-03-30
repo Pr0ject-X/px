@@ -8,6 +8,7 @@ use Pr0jectX\Px\ConfigTreeBuilder\ConfigTreeBuilder;
 use Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface;
 use Pr0jectX\Px\PxApp;
 use Pr0jectX\Px\CommandTasksBase;
+use Robo\Result;
 
 /**
  * Define the environment command.
@@ -45,9 +46,17 @@ class Environment extends CommandTasksBase
      *
      * @aliases env:up
      */
-    public function envStart(): void
+    public function envStart(array $opts = []): void
     {
-        $this->createInstance()->start();
+        $this->createInstance()->start($opts);
+    }
+
+    /**
+     * Run environment prerequisite one-time setup.
+     */
+    public function envSetup(array $opts = []): void
+    {
+        $this->createInstance()->setup($opts);
     }
 
     /**
@@ -110,9 +119,17 @@ class Environment extends CommandTasksBase
      *
      * @aliases ssh
      */
-    public function envSsh()
+    public function envSsh(array $opts = []): void
     {
-        $this->createInstance()->ssh();
+        $this->createInstance()->ssh($opts);
+    }
+
+    /**
+     * Run the environment debug features.
+     */
+    public function envDebug(array $opts = []): void
+    {
+        $this->createInstance()->debug($opts);
     }
 
     /**
@@ -138,11 +155,11 @@ class Environment extends CommandTasksBase
      * @option $silent
      *   Set if command output should be silent.
      */
-    public function envExecute(string $cmd, $opts = [
+    public function envExecute(string $cmd, array $opts = [
         'silent' => false,
-    ]): void
+    ]): Result
     {
-        $this->createInstance()->exec($cmd, $opts);
+        return $this->createInstance()->exec($cmd, $opts);
     }
 
     /**

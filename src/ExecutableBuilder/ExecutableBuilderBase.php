@@ -244,5 +244,4 @@ abstract class ExecutableBuilderBase
             $this->flattenArguments()
         ];
     }
-
 }

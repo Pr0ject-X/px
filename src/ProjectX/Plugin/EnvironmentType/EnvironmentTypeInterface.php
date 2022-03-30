@@ -62,6 +62,14 @@ interface EnvironmentTypeInterface extends
     public function start(array $opts = []);
 
     /**
+     * Set up the environment prerequisites.
+     *
+     * @param array $opts
+     *   An array of start options.
+     */
+    public function setup(array $opts = []);
+
+    /**
      * Stop the environment.
      *
      * @param array $opts
@@ -100,6 +108,11 @@ interface EnvironmentTypeInterface extends
      *   An array of ssh options.
      */
     public function ssh(array $opts = []);
+
+    /**
+     * Run the debug environment features.
+     */
+    public function debug(array $opts = []);
 
     /**
      * Execute a command on the environment.

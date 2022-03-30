@@ -46,7 +46,7 @@ class Database implements DatabaseInterface
      */
     public function isValid(): bool
     {
-        foreach ($this->getDatabaseProperties() as $value) {
+        foreach ($this->getProperties() as $value) {
             if (empty($value)) {
                 return false;
             }
@@ -169,7 +169,7 @@ class Database implements DatabaseInterface
      * @return array
      *   An array of the database connection details.
      */
-    protected function getDatabaseProperties(): array
+    public function getProperties(): array
     {
         return get_object_vars($this);
     }
