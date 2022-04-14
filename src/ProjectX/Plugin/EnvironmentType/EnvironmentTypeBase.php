@@ -115,7 +115,7 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     /**
      * {@inheritDoc}
      */
-    public function envDatabases(): array
+    public function envDatabases(bool $internal = false): array
     {
         return [];
     }
@@ -193,16 +193,11 @@ abstract class EnvironmentTypeBase extends PluginTasksBase implements Environmen
     }
 
     /**
-     * Select the environment database.
-     *
-     * @param string $name
-     *   The name of the database key.
-     *
-     * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase
+     * {@inheritDoc}
      */
-    public function selectEnvDatabase(string $name): EnvironmentDatabase
+    public function selectEnvDatabase(string $name, bool $internal = false): EnvironmentDatabase
     {
-        $databases = $this->envDatabases();
+        $databases = $this->envDatabases($internal);
 
         if (
             !isset($databases[$name])

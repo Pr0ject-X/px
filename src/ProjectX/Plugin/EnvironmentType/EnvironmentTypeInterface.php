@@ -190,18 +190,23 @@ interface EnvironmentTypeInterface extends
     /**
      * Define the environment databases.
      *
+     * @param bool $internal
+     *   Flag to determine if database is internal; otherwise considered external.
+     *
      * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase[]
      *   An array of environment databases.
      */
-    public function envDatabases(): array;
+    public function envDatabases(bool $internal): array;
 
     /**
      * Select the environment database.
      *
      * @param string $name
      *   The name of the database key.
+     * @param bool $internal
+     *   Flag to determine if database is internal; otherwise considered external.
      *
      * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentDatabase
      */
-    public function selectEnvDatabase(string $name): EnvironmentDatabase;
+    public function selectEnvDatabase(string $name, bool $internal): EnvironmentDatabase;
 }

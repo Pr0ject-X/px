@@ -34,12 +34,4 @@ class LocalhostEnvironmentType extends EnvironmentTypeBase
     {
         return PxApp::projectRootPath();
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function envDatabases(): array
-    {
-        return [];
-    }
 }
