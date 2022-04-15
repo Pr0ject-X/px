@@ -222,7 +222,7 @@ abstract class ExecutableBuilderBase
     protected function resolveExecutable(): string
     {
         $executable = strtolower(static::EXECUTABLE);
-        $composerBin = PxApp::getProjectComposer()['bin'] ?? 'vendor/bin';
+        $composerBin = PxApp::getProjectComposer()['config']['bin-dir'] ?? 'vendor/bin';
 
         if (file_exists(PxApp::projectRootPath() . "/$composerBin/$executable")) {
             return "$composerBin/$executable";

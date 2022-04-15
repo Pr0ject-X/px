@@ -7,15 +7,17 @@ function px()
     GIT_ROOT="."
   fi
 
-  if [ -f "$GIT_ROOT/vendor/bin/px" ]; then
-    $GIT_ROOT/vendor/bin/px "$@"
-  elif [ -f "$GIT_ROOT/../vendor/bin/px" ]; then
-    $GIT_ROOT/../vendor/bin/px "$@"
+  GIT_BIN=$(composer config bin-dir)
+
+  if [ -f "$GIT_ROOT/$GIT_BIN/px" ]; then
+    $GIT_ROOT/$GIT_BIN/px "$@"
+  elif [ -f "$GIT_ROOT/../$GIT_BIN/px" ]; then
+    $GIT_ROOT/../$GIT_BIN/px "$@"
   else
   	CWD_ROOT="$(pwd)";
 
-  	if [ -f "$CWD_ROOT/vendor/bin/px" ]; then
-  	  $CWD_ROOT/vendor/bin/px "$@"
+  	if [ -f "$CWD_ROOT/$GIT_BIN/px" ]; then
+  	  $CWD_ROOT/$GIT_BIN/px "$@"
   	else
       echo "You must run this command within a project that supports project-x."
       return 1
