@@ -152,23 +152,26 @@ class PxApp extends Application
     /**
      * Load a service from the container by an identifier.
      *
-     * @param $id
+     * @param string $identifier
      *   The container service identifier.
      *
      * @return mixed
      *   The instantiated service from the container.
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public static function service($id)
+    public static function service(string $identifier)
     {
-        return static::$container->get($id);
+        return static::$container->get($identifier);
     }
 
     /**
      * Create the project-x dependency injection container.
      *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param \Symfony\Component\Console\Input\InputInterface|null $input
      *   The console input stream.
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Symfony\Component\Console\Output\OutputInterface|null $output
      *   The console output stream.
      * @param \Symfony\Component\Console\Application $app
      *   The console application.
@@ -177,6 +180,9 @@ class PxApp extends Application
      *
      * @return \League\Container\ContainerInterface
      *   The instantiated dependency injection container.
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function createContainer(
         InputInterface $input = null,
@@ -386,6 +392,9 @@ class PxApp extends Application
      *
      * @return string
      *   The current project environment type.
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function getEnvironmentType(): string
     {
@@ -411,6 +420,9 @@ class PxApp extends Application
      *   An array of default configurations.
      *
      * @return \Pr0jectX\Px\ProjectX\Plugin\EnvironmentType\EnvironmentTypeInterface
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public static function getEnvironmentInstance(array $defaultConfig = []): EnvironmentTypeInterface
     {
@@ -434,8 +446,11 @@ class PxApp extends Application
      *
      * @return \Robo\Config\Config
      *   The project configuration instance.
+     *
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public static function getConfiguration()
+    public static function getConfiguration(): \Robo\Config\Config
     {
         return static::service('config');
     }

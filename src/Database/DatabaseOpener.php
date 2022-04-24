@@ -50,8 +50,6 @@ class DatabaseOpener
                 $name
             ));
         }
-
-        return null;
     }
 
     /**
