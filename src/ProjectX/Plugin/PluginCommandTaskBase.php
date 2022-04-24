@@ -28,4 +28,14 @@ abstract class PluginCommandTaskBase extends CommandTasksBase
     {
         return $this->plugin->getPluginCache();
     }
+
+    /**
+     * Get the plugin instance.
+     *
+     * @return \Pr0jectX\Px\ProjectX\Plugin\PluginInterface
+     */
+    protected function getPlugin(): PluginInterface
+    {
+        return $this->plugin;
+    }
 }
