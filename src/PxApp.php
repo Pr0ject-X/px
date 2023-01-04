@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pr0jectX\Px;
 
+use Composer\InstalledVersions;
 use League\Container\Container;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerInterface;
@@ -486,6 +487,20 @@ class PxApp extends Application
         }
 
         return false;
+    }
+
+    /**
+     * Get the installed composer package version.
+     *
+     * @param string $package
+     *   The composer vendor package name.
+     *
+     * @return string|null
+     */
+    public static function composerPackageVersion(
+        string $package
+    ): ?string {
+        return InstalledVersions::getVersion($package);
     }
 
     /**

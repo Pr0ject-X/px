@@ -7,7 +7,7 @@ function px()
     GIT_ROOT="."
   fi
 
-  GIT_BIN=$(composer config bin-dir)
+  GIT_BIN=$(composer config bin-dir -q)
 
   if [ -f "$GIT_ROOT/$GIT_BIN/px" ]; then
     $GIT_ROOT/$GIT_BIN/px "$@"

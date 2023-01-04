@@ -24,7 +24,7 @@ foreach ($autoLoaders as $path) {
 if (!$autoloadPath) {
     die("Could not find autoloader. Run 'composer install'.");
 }
-$classLoader = require "$autoloadPath";
+$classLoader = require $autoloadPath;
 
 $input = new ArgvInput($_SERVER['argv']);
 $output = new ConsoleOutput();
