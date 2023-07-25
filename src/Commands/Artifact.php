@@ -8,8 +8,8 @@ use Pr0jectX\Px\CommandTasksBase;
 use Pr0jectX\Px\ProjectX\Plugin\DeployType\DeployTypeInterface;
 use Pr0jectX\Px\PxApp;
 use Robo\Exception\TaskException;
-use Robo\Task\Composer\loadTasks as taskComposer;
-use Robo\Task\Filesystem\loadTasks as taskFilesystem;
+use Robo\Task\Composer\Tasks as taskComposer;
+use Robo\Task\Filesystem\Tasks as taskFilesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Finder\Finder;
 
