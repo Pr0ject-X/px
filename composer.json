@@ -17,12 +17,12 @@
     "require": {
         "php": ">=7.2",
         "ext-json": "*",
-        "consolidation/robo": "^4.0",
-        "symfony/cache": "^3.0|^4.0",
-        "symfony/config": "^3.0|^4.0",
-        "symfony/finder": "^4.0|^5.0",
-        "symfony/console": "^3.0|^4.0",
-        "symfony/http-client": "^5.4",
+        "consolidation/robo": "^1.0|^2.0|^3.0|^4.0",
+        "symfony/cache": "^4.0|^5.0|^6.0",
+        "symfony/config": "^4.0|^5.0|^6.0",
+        "symfony/finder": "^4.0|^5.0|^6.0",
+        "symfony/console": "^4.0|^5.0|^6.0",
+        "symfony/http-client": "^4.0|^5.0|^6.0",
         "knplabs/packagist-api": "^1.5",
         "danielstjules/stringy": "^3.1"
     },
