@@ -7,7 +7,7 @@ use Robo\Collection\CollectionBuilder;
 use Robo\Task\Vcs\GitStack;
 use Symfony\Component\Console\Input\InputOption;
 use Pr0jectX\Px\Exception\DeployTypeOptionRequired;
-use Robo\Task\Vcs\loadTasks as taskVcs;
+use Robo\Task\Vcs\Tasks as taskVcs;
 
 /**
  * The GIT deployment implementation.

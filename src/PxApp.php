@@ -7,7 +7,7 @@ namespace Pr0jectX\Px;
 use Composer\InstalledVersions;
 use League\Container\Container;
 use League\Container\ContainerAwareInterface;
-use League\Container\ContainerInterface;
+use League\Container\DefinitionContainerInterface;
 use Pr0jectX\Px\Commands\Artifact;
 use Pr0jectX\Px\Commands\Config;
 use Pr0jectX\Px\Commands\Core;
@@ -44,7 +44,7 @@ class PxApp extends Application
     protected const PLUGIN_NAMESPACE = 'ProjectX\Plugin';
 
     /**
-     * @var \League\Container\ContainerInterface
+     * @var \League\Container\DefinitionContainerInterface
      */
     protected static $container;
 
@@ -179,7 +179,7 @@ class PxApp extends Application
      * @param $classLoader
      *   The console class loader.
      *
-     * @return \League\Container\ContainerInterface
+     * @return \League\Container\DefinitionContainerInterface
      *   The instantiated dependency injection container.
      *
      * @throws \Psr\Container\ContainerExceptionInterface
@@ -204,23 +204,23 @@ class PxApp extends Application
                 return HttpClient::create();
             });
 
-            $container->share('workflowManager', WorkflowManager::class)
-                ->withArguments([
+            $container->addShared('workflowManager', WorkflowManager::class)
+                ->addArguments([
                     'config', 'relativeNamespaceDiscovery'
                 ]);
 
-            $container->share('executeTypeManager', ExecuteTypeManager::class);
+            $container->addShared('executeTypeManager', ExecuteTypeManager::class);
 
-            $container->share('deployTypePluginManager', DeployTypePluginManager::class)
-                ->withArguments([
+            $container->addShared('deployTypePluginManager', DeployTypePluginManager::class)
+                ->addArguments([
                     'input', 'output', 'relativeNamespaceDiscovery'
                 ]);
-            $container->share('commandTypePluginManager', CommandTypePluginManager::class)
-                ->withArguments([
+            $container->addShared('commandTypePluginManager', CommandTypePluginManager::class)
+                ->addArguments([
                     'input', 'output', 'relativeNamespaceDiscovery'
                 ]);
-            $container->share('environmentTypePluginManager', EnvironmentTypePluginManager::class)
-                ->withArguments([
+            $container->addShared('environmentTypePluginManager', EnvironmentTypePluginManager::class)
+                ->addArguments([
                     'input', 'output', 'relativeNamespaceDiscovery'
                 ]);
 
@@ -235,10 +235,10 @@ class PxApp extends Application
     /**
      * Get the project-x container.
      *
-     * @return \League\Container\ContainerInterface
+     * @return \League\Container\DefinitionContainerInterface
      *   The project-x service container.
      */
-    public static function getContainer(): ContainerInterface
+    public static function getContainer(): DefinitionContainerInterface
     {
         return static::$container;
     }
@@ -252,7 +252,7 @@ class PxApp extends Application
     public static function hasContainer(): bool
     {
         return isset(static::$container)
-            && static::$container instanceof ContainerInterface;
+            && static::$container instanceof DefinitionContainerInterface;
     }
 
     /**
